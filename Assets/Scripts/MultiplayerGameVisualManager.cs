@@ -90,11 +90,11 @@ public class GameVisualManager : NetworkBehaviour
     //void Start()
     //{
     //    Debug.Log("Start GraphDrawer");
-    //    GameManager.Instance.OnGameEnded += GameManager_OnGameEnded;
+    //    MultiplayerGameManager.Instance.OnGameEnded += MultiplayerGameManager_OnGameEnded;
     //    gameObject.SetActive(false);
     //}
 
-    //private void GameManager_OnGameEnded(object sender, System.EventArgs e)
+    //private void MultiplayerGameManager_OnGameEnded(object sender, System.EventArgs e)
     //{
     //    Debug.Log("OnGameEnded GraphDrawer");
 
@@ -104,11 +104,11 @@ public class GameVisualManager : NetworkBehaviour
     private int GetYMax()
     {
         int maxValue = 0;
-        for (int i = 0; i < GameManager.Instance.scores.Count; i++)
+        for (int i = 0; i < MultiplayerGameManager.Instance.scores.Count; i++)
         {
-            if (GameManager.Instance.scores[i] > maxValue)
+            if (MultiplayerGameManager.Instance.scores[i] > maxValue)
             {
-                maxValue = GameManager.Instance.scores[i];
+                maxValue = MultiplayerGameManager.Instance.scores[i];
             }
         }
         return maxValue;
@@ -123,18 +123,18 @@ public class GameVisualManager : NetworkBehaviour
 
         float graphWidth = graphContainer.rect.width;
         float graphHeight = graphContainer.rect.height;
-        float xSpacing = graphWidth / (GameManager.Instance.history.Count - 1);
+        float xSpacing = graphWidth / (MultiplayerGameManager.Instance.history.Count - 1);
 
         float yMax = GetYMax();
 
         Vector2 lastPointPos = Vector2.zero;
 
-        for (int j = 0; j < GameManager.Instance.scores.Count; j++)
+        for (int j = 0; j < MultiplayerGameManager.Instance.scores.Count; j++)
         {
-            for (int i = 0; i < GameManager.Instance.history.Count; i++)
+            for (int i = 0; i < MultiplayerGameManager.Instance.history.Count; i++)
             {
                 float xPos = i * xSpacing;
-                float yPos = (GameManager.Instance.history[i][j] / yMax) * graphHeight;
+                float yPos = (MultiplayerGameManager.Instance.history[i][j] / yMax) * graphHeight;
                 Vector2 currentPointPos = new Vector2(xPos - graphWidth / 2, yPos - graphHeight / 2);
 
                 // Draw line segment to previous point (if not the first point)
@@ -151,10 +151,10 @@ public class GameVisualManager : NetworkBehaviour
 
             }
 
-            for (int i = 0; i < GameManager.Instance.history.Count; i++)
+            for (int i = 0; i < MultiplayerGameManager.Instance.history.Count; i++)
             {
                 float xPos = i * xSpacing;
-                float yPos = (GameManager.Instance.history[i][j] / yMax) * graphHeight;
+                float yPos = (MultiplayerGameManager.Instance.history[i][j] / yMax) * graphHeight;
                 Vector2 currentPointPos = new Vector2(xPos - graphWidth / 2, yPos - graphHeight / 2);
 
                 // Draw line segment to previous point (if not the first point)
@@ -220,14 +220,14 @@ public class GameVisualManager : NetworkBehaviour
 
     private void Start()
     {
-        GameManager.Instance.OnDoMove += GameManager_OnDoMove;
-        GameManager.Instance.OnGameStarted += GameManager_OnGameStarted;
-        GameManager.Instance.OnAddDice += GameManager_OnAddDice;
-        GameManager.Instance.OnUpdateScore += GameManager_OnUpdateScore;
-        GameManager.Instance.OnBeginMove += GameManager_OnBeginMove;
-        GameManager.Instance.OnRemoveDiceFromBag += GameManager_OnRemoveDiceFromBag;
-        GameManager.Instance.OnGameEnded += GameManager_OnGameEnded;
-        GameManager.Instance.OnTurnChanged += GameManager_OnTurnChanged;
+        MultiplayerGameManager.Instance.OnDoMove += MultiplayerGameManager_OnDoMove;
+        MultiplayerGameManager.Instance.OnGameStarted += MultiplayerGameManager_OnGameStarted;
+        MultiplayerGameManager.Instance.OnAddDice += MultiplayerGameManager_OnAddDice;
+        MultiplayerGameManager.Instance.OnUpdateScore += MultiplayerGameManager_OnUpdateScore;
+        MultiplayerGameManager.Instance.OnBeginMove += MultiplayerGameManager_OnBeginMove;
+        MultiplayerGameManager.Instance.OnRemoveDiceFromBag += MultiplayerGameManager_OnRemoveDiceFromBag;
+        MultiplayerGameManager.Instance.OnGameEnded += MultiplayerGameManager_OnGameEnded;
+        MultiplayerGameManager.Instance.OnTurnChanged += MultiplayerGameManager_OnTurnChanged;
 
         winnerGraph.SetActive(false);
 
@@ -257,7 +257,7 @@ public class GameVisualManager : NetworkBehaviour
 
         //initialTile.tag = "Dice";
         //initialTile.GetComponent<SpriteRenderer>().color = Color.white;
-        //GameManager.instance.SetDice(transform.position, false);
+        //MultiplayerGameManager.instance.SetDice(transform.position, false);
         for (int i = 0; i < nameText.Length; i++)
         {
             nameText[i].color = winnerTextDarkColor;
@@ -276,20 +276,20 @@ public class GameVisualManager : NetworkBehaviour
 
     //}
 
-    private void GameManager_OnTurnChanged(object sender, EventArgs e)
+    private void MultiplayerGameManager_OnTurnChanged(object sender, EventArgs e)
     {
         for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
         {
-            Color darkColor = GameManager.Instance.winners.Contains(i) ? winnerTextDarkColor : playerTextDarkColor;
+            Color darkColor = MultiplayerGameManager.Instance.winners.Contains(i) ? winnerTextDarkColor : playerTextDarkColor;
             scoreText[i].color = darkColor;
             nameText[i].color = darkColor;
 
-            //scoreText[i].text = GameManager.Instance.scores[i].ToString();
+            //scoreText[i].text = MultiplayerGameManager.Instance.scores[i].ToString();
 
-            if (i == (int)GameManager.Instance.currentIdTurn.Value)
+            if (i == (int)MultiplayerGameManager.Instance.currentIdTurn.Value)
             {
                 //result += i + ") " + e.value + "\n";
-                Color lightColor = GameManager.Instance.winners.Contains(i) ? winnerTextLightColor : playerTextLightColor;
+                Color lightColor = MultiplayerGameManager.Instance.winners.Contains(i) ? winnerTextLightColor : playerTextLightColor;
                 scoreText[i].color = lightColor;
                 nameText[i].color = lightColor;
             }
@@ -302,7 +302,7 @@ public class GameVisualManager : NetworkBehaviour
     //    winnerGraph.SetActive(true);
     //}
 
-    private void GameManager_OnGameEnded(object sender, EventArgs e)
+    private void MultiplayerGameManager_OnGameEnded(object sender, EventArgs e)
     {
         ShowWinnerRpc();
 
@@ -317,7 +317,7 @@ public class GameVisualManager : NetworkBehaviour
         //{
         //    endName[i].gameObject.SetActive(true);
         //    endScore[i].gameObject.SetActive(true);
-        //    if (GameManager.Instance.winners.Contains(i))
+        //    if (MultiplayerGameManager.Instance.winners.Contains(i))
         //        endWinner[i].gameObject.SetActive(true);
 
         //    endName[i].text = nameText[i].text;
@@ -329,7 +329,7 @@ public class GameVisualManager : NetworkBehaviour
         {
             endName[i].gameObject.SetActive(true);
             endScore[i].gameObject.SetActive(true);
-            if (GameManager.Instance.winners.Contains(i))
+            if (MultiplayerGameManager.Instance.winners.Contains(i))
             {
                 endWinner[i].gameObject.SetActive(true);
                 //winnerText.text += nameText[i].text + " \t " + scoreText[i].text + "\n";
@@ -353,7 +353,7 @@ public class GameVisualManager : NetworkBehaviour
         //winnerText.text = winnerName;
     }
 
-    private void GameManager_OnRemoveDiceFromBag(object sender, GameManager.OnRemoveDiceFromBagArgs e)
+    private void MultiplayerGameManager_OnRemoveDiceFromBag(object sender, MultiplayerGameManager.OnRemoveDiceFromBagArgs e)
     {
         UpdateBagSizeRpc(e.size);
     }
@@ -369,7 +369,7 @@ public class GameVisualManager : NetworkBehaviour
     //{
     //    int index = (int)NetworkManager.Singleton.LocalClientId;
     //    Color color = playerTextLightColor;
-    //    if (GameManager.Instance.winners.Contains(index))
+    //    if (MultiplayerGameManager.Instance.winners.Contains(index))
     //    {
     //        color = winnerTextLightColor;
     //    }
@@ -382,7 +382,7 @@ public class GameVisualManager : NetworkBehaviour
     //    HighlightTurn();
     //}
 
-    private void GameManager_OnBeginMove(object sender, EventArgs e)
+    private void MultiplayerGameManager_OnBeginMove(object sender, EventArgs e)
     {
         CheckMoves();
         //HighlightNameRpc();
@@ -393,16 +393,16 @@ public class GameVisualManager : NetworkBehaviour
     //    Debug.Log("HighlightTurn");
     //    for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
     //    {
-    //        Color darkColor = GameManager.Instance.winners.Contains(i) ? winnerTextDarkColor : playerTextDarkColor;
+    //        Color darkColor = MultiplayerGameManager.Instance.winners.Contains(i) ? winnerTextDarkColor : playerTextDarkColor;
     //        scoreText[i].color = darkColor;
     //        nameText[i].color = darkColor;
 
-    //        scoreText[i].text = GameManager.Instance.scores[i].ToString();
+    //        scoreText[i].text = MultiplayerGameManager.Instance.scores[i].ToString();
 
-    //        if (i == (int)GameManager.Instance.currentIdTurn.Value)
+    //        if (i == (int)MultiplayerGameManager.Instance.currentIdTurn.Value)
     //        {
     //            //result += i + ") " + e.value + "\n";
-    //            Color lightColor = GameManager.Instance.winners.Contains(i) ? winnerTextLightColor : playerTextLightColor;
+    //            Color lightColor = MultiplayerGameManager.Instance.winners.Contains(i) ? winnerTextLightColor : playerTextLightColor;
     //            scoreText[i].color = lightColor;
     //            nameText[i].color = lightColor;
     //        }
@@ -460,21 +460,21 @@ public class GameVisualManager : NetworkBehaviour
         }
     }
 
-    private void GameManager_OnUpdateScore(object sender, GameManager.OnUpdateScoreArgs e)
+    private void MultiplayerGameManager_OnUpdateScore(object sender, MultiplayerGameManager.OnUpdateScoreArgs e)
     {
         
         for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
         {
-            //Color darkColor = GameManager.Instance.winners.Contains(i) ? winnerTextDarkColor : playerTextDarkColor;
+            //Color darkColor = MultiplayerGameManager.Instance.winners.Contains(i) ? winnerTextDarkColor : playerTextDarkColor;
             //scoreText[i].color = darkColor;
             //nameText[i].color = darkColor;
 
-            scoreText[i].text = GameManager.Instance.scores[i].ToString();
+            scoreText[i].text = MultiplayerGameManager.Instance.scores[i].ToString();
 
-            //if (i == (int)GameManager.Instance.currentIdTurn.Value)
+            //if (i == (int)MultiplayerGameManager.Instance.currentIdTurn.Value)
             //{
             //    //result += i + ") " + e.value + "\n";
-            //    Color lightColor = GameManager.Instance.winners.Contains(i) ? winnerTextLightColor : playerTextLightColor;
+            //    Color lightColor = MultiplayerGameManager.Instance.winners.Contains(i) ? winnerTextLightColor : playerTextLightColor;
             //    scoreText[i].color = lightColor;
             //    nameText[i].color = lightColor;
             //}
@@ -483,7 +483,7 @@ public class GameVisualManager : NetworkBehaviour
         //string result = "";
         //for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
         //{
-        //    Color darkColor = GameManager.Instance.winners.Contains(i) ? winnerTextDarkColor : playerTextDarkColor;
+        //    Color darkColor = MultiplayerGameManager.Instance.winners.Contains(i) ? winnerTextDarkColor : playerTextDarkColor;
         //    scoreText[i].color = darkColor;
         //    nameText[i].color = darkColor;
         //    //if (i == e.index)
@@ -493,14 +493,14 @@ public class GameVisualManager : NetworkBehaviour
         //    //}
         //    //else
         //    //{
-        //        //result += i + ") " + GameManager.Instance.scores[i] + "\n";
-        //        scoreText[i].text = GameManager.Instance.scores[i].ToString();
+        //        //result += i + ") " + MultiplayerGameManager.Instance.scores[i] + "\n";
+        //        scoreText[i].text = MultiplayerGameManager.Instance.scores[i].ToString();
         //    //}
 
-        //    if (i == (int)GameManager.Instance.currentIdTurn.Value)
+        //    if (i == (int)MultiplayerGameManager.Instance.currentIdTurn.Value)
         //    {
         //        //result += i + ") " + e.value + "\n";
-        //        Color lightColor = GameManager.Instance.winners.Contains(i) ? winnerTextLightColor : playerTextLightColor;
+        //        Color lightColor = MultiplayerGameManager.Instance.winners.Contains(i) ? winnerTextLightColor : playerTextLightColor;
         //        scoreText[i].color = lightColor;
         //        nameText[i].color = lightColor;
         //    }
@@ -571,7 +571,7 @@ public class GameVisualManager : NetworkBehaviour
         //panel[pressed].transform.position += Vector3.down * newDiceDistance;
     }
 
-    private void GameManager_OnAddDice(object sender, GameManager.OnAddDiceArgs e)
+    private void MultiplayerGameManager_OnAddDice(object sender, MultiplayerGameManager.OnAddDiceArgs e)
     {
         //ChangeButtonColor(pressed, Color.white);
         if (e.code == null)
@@ -607,7 +607,7 @@ public class GameVisualManager : NetworkBehaviour
     //    panelCodes = new int[panel.Length][];
     //    for (int i = 0; i < panel.Length; i++)
     //    {
-    //        GameManager.Instance.GetDiceRpc(NetworkManager.Singleton.LocalClientId);
+    //        MultiplayerGameManager.Instance.GetDiceRpc(NetworkManager.Singleton.LocalClientId);
     //    }
     //}
 
@@ -621,8 +621,8 @@ public class GameVisualManager : NetworkBehaviour
 
         panelCodes = new int[panel.Length][];
         //panelCodes[3] = new int[3] { -1, -1, -1 };
-        //int[] zeroBag = GameManager.instance.GetDiceRpc(0);
-        //GameManager.Instance.GetDiceRpc(NetworkManager.Singleton.LocalClientId, 0);
+        //int[] zeroBag = MultiplayerGameManager.instance.GetDiceRpc(0);
+        //MultiplayerGameManager.Instance.GetDiceRpc(NetworkManager.Singleton.LocalClientId, 0);
         //for (int j = 0; j < 3; j++)
         //{
         //    //panel[3].transform.GetChild(j).gameObject.GetComponent<TextMeshProUGUI>().text = bag[0][j].ToString() == "0" ? "" : bag[0][j].ToString();
@@ -633,8 +633,8 @@ public class GameVisualManager : NetworkBehaviour
         //for (int i = 0; i < panel.Length - 1; i++)
         for (int i = 0; i < panel.Length; i++)
         {
-            GameManager.Instance.GetDiceRpc(NetworkManager.Singleton.LocalClientId);
-            //int[] ints = GameManager.instance.GetDiceRpc();
+            MultiplayerGameManager.Instance.GetDiceRpc(NetworkManager.Singleton.LocalClientId);
+            //int[] ints = MultiplayerGameManager.instance.GetDiceRpc();
             //panelCodes[i] = new int[3] { -1, -1, -1 };
             //for (int j = 0; j < 3; j++)
             //{
@@ -645,7 +645,7 @@ public class GameVisualManager : NetworkBehaviour
             //}
         }
         //Debug.Log("Showed!!!");
-        //Debug.Log("Bag Count = " + GameManager.instance.bag.Count);
+        //Debug.Log("Bag Count = " + MultiplayerGameManager.instance.bag.Count);
         //CheckMovesRpc();
     }
 
@@ -679,10 +679,10 @@ public class GameVisualManager : NetworkBehaviour
         }
     }
 
-    private void GameManager_OnGameStarted(object sender, EventArgs e)
+    private void MultiplayerGameManager_OnGameStarted(object sender, EventArgs e)
     {
-        SpawnInitialObjectRpc();
         //Debug.Log("Game started");
+        SpawnInitialObjectRpc();
         ShowPanelRpc();
 
         ShowNamesRpc();
@@ -700,7 +700,7 @@ public class GameVisualManager : NetworkBehaviour
         SpawnPlaceRpc(position, false);
         ConstructTilesAround(position, false, new int[3] { 0, 0, 0 });
         //SubscribeTilesAround(position, false, new int[3] { 0, 0, 0 });
-        //GameManager.instance.SetDice(position, false);
+        //MultiplayerGameManager.instance.SetDice(position, false);
 
         //Transform initialTile = Instantiate(tilePrefab, new Vector2(0f, 0f), Quaternion.identity);
         //initialTile.GetComponent<NetworkObject>().Spawn(true);
@@ -751,7 +751,7 @@ public class GameVisualManager : NetworkBehaviour
         {
             if (hit.CompareTag("Dice"))
             {
-                GameManager.Instance.UpdateScores(clientId, value);
+                MultiplayerGameManager.Instance.UpdateScores(clientId, value);
             }
         }
     }
@@ -795,7 +795,7 @@ public class GameVisualManager : NetworkBehaviour
         }
     }
 
-    private void GameManager_OnDoMove(object sender, GameManager.OnDoMoveArgs e)
+    private void MultiplayerGameManager_OnDoMove(object sender, MultiplayerGameManager.OnDoMoveArgs e)
     {
         //SpawnObjectRpc(e.position, e.state);
         //Vector2 position = e.position;
@@ -806,7 +806,7 @@ public class GameVisualManager : NetworkBehaviour
         //SubscribeTilesAround(e.position, e.state, e.code);
 
         //ChangeButtonColor(pressed, Color.white);
-        GameManager.Instance.GetDiceRpc(NetworkManager.Singleton.LocalClientId);
+        MultiplayerGameManager.Instance.GetDiceRpc(NetworkManager.Singleton.LocalClientId);
         //CheckMovesRpc();
         UnenableButtons();
         //UpdateBagSizeRpc();
@@ -956,7 +956,7 @@ public class GameVisualManager : NetworkBehaviour
     private void Try(GameObject place, int offset)
     {
         int[] code = new int[3] { place.GetComponent<Tile>().code[0], place.GetComponent<Tile>().code[1], place.GetComponent<Tile>().code[2] };
-        int[] diceCode = GameManager.Instance.chosenCode;
+        int[] diceCode = MultiplayerGameManager.Instance.chosenCode;
         //int offset = 0;
         //for (int i = 0; i < place.transform.childCount; i++)
         //{
@@ -1014,7 +1014,7 @@ public class GameVisualManager : NetworkBehaviour
     {
         //int[] code = place.GetComponent<Tile>().code;
         int[] code = new int[3] { place.GetComponent<Tile>().code[0], place.GetComponent<Tile>().code[1], place.GetComponent<Tile>().code[2] };
-        int[] diceCode = GameManager.Instance.chosenCode;
+        int[] diceCode = MultiplayerGameManager.Instance.chosenCode;
 
         //Debug.Log("DiceCode Length = " + diceCode.Length);
         //Debug.Log("Code Length = " + code.Length);
@@ -1081,7 +1081,7 @@ public class GameVisualManager : NetworkBehaviour
         //StopAnimationChoose();
         //StartAnimationChoose();
         //diceCode = GetCurrentDice(pressed);
-        GameManager.Instance.chosenCode = panelCodes[pressed];
+        MultiplayerGameManager.Instance.chosenCode = panelCodes[pressed];
         //Debug.Log(diceCode);
 
         Transform board = GameObject.FindGameObjectWithTag("Board").transform;
@@ -1168,7 +1168,7 @@ public class GameVisualManager : NetworkBehaviour
         availableDice--;
         if (availableDice == 0)
         {
-            GameManager.Instance.SkipMoveRpc();
+            MultiplayerGameManager.Instance.SkipMoveRpc();
         }
     }
 
@@ -1229,7 +1229,7 @@ public class GameVisualManager : NetworkBehaviour
         //Debug.Log("availableDice = " + availableDice);
         //if (availableDice == 0)
         //{
-        //    GameManager.Instance.SkipMoveRpc();
+        //    MultiplayerGameManager.Instance.SkipMoveRpc();
         //}
     }
 }

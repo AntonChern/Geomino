@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 //using static UnityEditor.Experimental.GraphView.GraphView;
 
-public class Tile : NetworkBehaviour
+public class Tile : NetworkBehaviour, ITile
 {
     private NetworkVariable<bool> state = new NetworkVariable<bool>(false);
     //public int[] code;
@@ -13,6 +13,20 @@ public class Tile : NetworkBehaviour
     public void SetState(bool state)
     {
         this.state.Value = state;
+    }
+
+    public int[] GetCode()
+    {
+        return new int[] { code[0], code[1], code[2] };
+    }
+
+    public void SetTemporaryCode(int index, int value)
+    {
+        temporaryCode[index] = value;
+    }
+    public void ChangeColor(Color color)
+    {
+        ChangeColor(gameObject, color);
     }
 
     public int GetFacesNumber()
@@ -50,9 +64,10 @@ public class Tile : NetworkBehaviour
         }
         //Debug.Log("CODE = " + code[0] + ", " + code[1] + ", " + code[2]);
         //Debug.Log("TEMP CODE = " + temporaryCode[0] + ", " + temporaryCode[1] + ", " + temporaryCode[2]);
-        GameManager.Instance.DoMove(transform.position, state.Value, new int[3] { temporaryCode[0], temporaryCode[1], temporaryCode[2] });
+        //MultiplayerGameManager.Instance.DoMove(transform.position, state.Value, new int[3] { temporaryCode[0], temporaryCode[1], temporaryCode[2] });
+        GameHandler.Instance.MakeMove(transform.position, state.Value, temporaryCode);
         //code = temporaryCode;
-        //GameManager.instance.DoMove(transform.position, state.Value, code);
+        //MultiplayerGameManager.instance.DoMove(transform.position, state.Value, code);
     }
 
     private void Awake()
@@ -75,7 +90,7 @@ public class Tile : NetworkBehaviour
             return;
         //Debug.Log("Clicked! " + transform.position);
         Dice();
-        //GameManager.instance.Boob();
+        //MultiplayerGameManager.instance.Boob();
     }
 
     private void ChangeColor(GameObject obj, Color color)

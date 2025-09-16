@@ -7496,7 +7496,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53156feb588108749b47078d9ba95225, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roomList: {fileID: 1046294850}
   exitMessage: {fileID: 1034642213}
 --- !u!1 &2022355881
 GameObject:

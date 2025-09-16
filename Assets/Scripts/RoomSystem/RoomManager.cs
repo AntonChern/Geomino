@@ -45,6 +45,7 @@ public class RoomManager : MonoBehaviour
 
     private void Awake()
     {
+        //Debug.Log($"NetworkManager.Singleton.LocalClientId {NetworkManager.Singleton.LocalClientId}");
         if (Instance != null)
         {
             //this.ActiveSession = Instance.ActiveSession;

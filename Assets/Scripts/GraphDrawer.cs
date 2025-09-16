@@ -16,11 +16,11 @@ public class GraphDrawer : NetworkBehaviour
     void Start()
     {
         Debug.Log("Start GraphDrawer");
-        GameManager.Instance.OnGameEnded += GameManager_OnGameEnded;
+        MultiplayerGameManager.Instance.OnGameEnded += MultiplayerGameManager_OnGameEnded;
         gameObject.SetActive(false);
     }
 
-    private void GameManager_OnGameEnded(object sender, System.EventArgs e)
+    private void MultiplayerGameManager_OnGameEnded(object sender, System.EventArgs e)
     {
         Debug.Log("OnGameEnded GraphDrawer");
         
@@ -30,11 +30,11 @@ public class GraphDrawer : NetworkBehaviour
     private int GetYMax()
     {
         int maxValue = 0;
-        for (int i = 0; i < GameManager.Instance.scores.Count; i++)
+        for (int i = 0; i < MultiplayerGameManager.Instance.scores.Count; i++)
         {
-            if (GameManager.Instance.scores[i] > maxValue)
+            if (MultiplayerGameManager.Instance.scores[i] > maxValue)
             {
-                maxValue = GameManager.Instance.scores[i];
+                maxValue = MultiplayerGameManager.Instance.scores[i];
             }
         }
         return maxValue;
@@ -49,18 +49,18 @@ public class GraphDrawer : NetworkBehaviour
 
         float graphWidth = graphContainer.rect.width;
         float graphHeight = graphContainer.rect.height;
-        float xSpacing = graphWidth / (GameManager.Instance.history.Count - 1);
+        float xSpacing = graphWidth / (MultiplayerGameManager.Instance.history.Count - 1);
 
         float yMax = GetYMax();
 
         Vector2 lastPointPos = Vector2.zero;
 
-        for (int j = 0; j < GameManager.Instance.scores.Count; j++)
+        for (int j = 0; j < MultiplayerGameManager.Instance.scores.Count; j++)
         {
-            for (int i = 0; i < GameManager.Instance.history.Count; i++)
+            for (int i = 0; i < MultiplayerGameManager.Instance.history.Count; i++)
             {
                 float xPos = i * xSpacing;
-                float yPos = (GameManager.Instance.history[i][j] / yMax) * graphHeight;
+                float yPos = (MultiplayerGameManager.Instance.history[i][j] / yMax) * graphHeight;
                 Vector2 currentPointPos = new Vector2(xPos - graphWidth / 2, yPos - graphHeight / 2);
 
                 // Create and position data point

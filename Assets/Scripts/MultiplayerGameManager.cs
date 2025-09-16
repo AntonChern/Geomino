@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 //using UnityEngine.UIElements;
 //using Mirror;
 
-public class GameManager : NetworkBehaviour
+public class MultiplayerGameManager : NetworkBehaviour
 {
     private Dictionary<ulong, bool> sceneLoaded = new Dictionary<ulong, bool>();
 
@@ -37,7 +37,7 @@ public class GameManager : NetworkBehaviour
     public NetworkList<int> scores = new NetworkList<int>();
     //public NetworkList<int> scores;
 
-    public static GameManager Instance { get; private set; }
+    public static MultiplayerGameManager Instance { get; private set; }
 
     public event EventHandler<OnDoMoveArgs> OnDoMove;
     public class OnDoMoveArgs : EventArgs
@@ -82,13 +82,14 @@ public class GameManager : NetworkBehaviour
     {
         if (Instance != null)
         {
-            Debug.LogError("More than one GameManager instance!");
+            Debug.LogError("More than one MultiplayerGameManager instance!");
         }
         Instance = this;
     }
 
     public override void OnNetworkSpawn()
     {
+        //var f = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<>;
         //base.OnNetworkSpawn();
         Debug.Log("On Network Spawn");
         if (IsServer)
@@ -122,10 +123,10 @@ public class GameManager : NetworkBehaviour
         Debug.Log($"Client {clientId} is ready");
         if (sceneLoaded.Values.All(value => value))
         {
-            //Debug.Log("Server is servering");
             GenerateBag();
             InitiateScores();
             OnGameStarted?.Invoke(this, EventArgs.Empty);
+            //Debug.Log("Server is servering");
             DisplayPlaces();
         }
     }
@@ -574,7 +575,7 @@ public class GameManager : NetworkBehaviour
         //    }
 
         //}
-        //Debug.Log("GameManager DoMove()");
+        //Debug.Log("MultiplayerGameManager DoMove()");
     }
 
     //public void SelectDice()

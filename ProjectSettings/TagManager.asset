@@ -7,6 +7,7 @@ TagManager:
   - Place
   - Dice
   - Board
+  - DiceUI
   layers:
   - Default
   - TransparentFX

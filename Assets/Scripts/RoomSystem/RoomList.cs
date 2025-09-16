@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using Unity.Services.Multiplayer;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,6 +34,7 @@ public class RoomList : MonoBehaviour
         //});
         updateButton.onClick.AddListener(() =>
         {
+            //Debug.Log($"NetworkManager.Singleton.LocalClientId {NetworkManager.Singleton.LocalClientId}");
             UpdateRoomList();
         });
 
