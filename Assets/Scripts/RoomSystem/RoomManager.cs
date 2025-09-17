@@ -82,14 +82,25 @@ public class RoomManager : MonoBehaviour
             //networkManager.SceneManager.OnLoad += SceneManager_OnLoad;
             //Debug.Log(networkManager.SceneManager == null);
 
+            //Debug.Log($"Initialized? {UnityServices.State == ServicesInitializationState.Initialized}");
+            //if (UnityServices.State != ServicesInitializationState.Initialized)
+            //{
             await UnityServices.InitializeAsync();
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            //}
             Debug.Log($"Signed in anonymously succeeded! PlayerID: {AuthenticationService.Instance.PlayerId}");
         }
         catch (Exception e)
         {
             Debug.LogException(e);
         }
+    }
+
+    private void OnDestroy()
+    {
+        //UnityServices.
+        //Debug.Log($"Sign Out");
+        AuthenticationService.Instance.SignOut();
     }
 
     private void Update()

@@ -1,45 +1,44 @@
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
 //using static UnityEditor.Experimental.GraphView.GraphView;
 
-public class Tile : NetworkBehaviour, ITile
+public class Tile : MonoBehaviour//, ITile
 {
-    private NetworkVariable<bool> state = new NetworkVariable<bool>(false);
-    //public int[] code;
-    public NetworkList<int> code = new NetworkList<int>(new int[3]{ -1,-1,-1 });
-    public int[] temporaryCode;
+    //private NetworkVariable<bool> state = new NetworkVariable<bool>(false);
+    ////public int[] code;
+    //public NetworkList<int> code = new NetworkList<int>(new int[3]{ -1,-1,-1 });
+    //public int[] temporaryCode;
 
-    public void SetState(bool state)
-    {
-        this.state.Value = state;
-    }
+    //public void SetState(bool state)
+    //{
+    //    this.state.Value = state;
+    //}
 
-    public int[] GetCode()
-    {
-        return new int[] { code[0], code[1], code[2] };
-    }
+    //public int[] GetCode()
+    //{
+    //    return new int[] { code[0], code[1], code[2] };
+    //}
 
-    public void SetTemporaryCode(int index, int value)
-    {
-        temporaryCode[index] = value;
-    }
-    public void ChangeColor(Color color)
-    {
-        ChangeColor(gameObject, color);
-    }
+    //public void SetTemporaryCode(int index, int value)
+    //{
+    //    temporaryCode[index] = value;
+    //}
+    //public void ChangeColor(Color color)
+    //{
+    //    ChangeColor(gameObject, color);
+    //}
 
-    public int GetFacesNumber()
-    {
-        //return code.Length;
-        return code.Count;
-    }
+    //public int GetFacesNumber()
+    //{
+    //    //return code.Length;
+    //    return code.Count;
+    //}
 
-    [Rpc(SendTo.Server)]
-    public void SetCodeRpc(int index, int value)
-    {
-        code[index] = value;
-    }
+    //[Rpc(SendTo.Server)]
+    //public void SetCodeRpc(int index, int value)
+    //{
+    //    code[index] = value;
+    //}
 
     //[Rpc(SendTo.Server)]
     //private void RewriteCodeRpc()
@@ -50,32 +49,32 @@ public class Tile : NetworkBehaviour, ITile
     //    }
     //}
 
-    public void Dice()
-    {
-        //gameObject.tag = "Dice";
-        //gameObject.GetComponent<SpriteRenderer>().color = Color.white;
-        //for (int i = 0; i < code.Count; i++) {
-        //    code[i] = temporaryCode[i];
-        //}
-        //RewriteCodeRpc();
-        for (int i = 0; i < code.Count; i++)
-        {
-            SetCodeRpc(i, temporaryCode[i]);
-        }
-        //Debug.Log("CODE = " + code[0] + ", " + code[1] + ", " + code[2]);
-        //Debug.Log("TEMP CODE = " + temporaryCode[0] + ", " + temporaryCode[1] + ", " + temporaryCode[2]);
-        //MultiplayerGameManager.Instance.DoMove(transform.position, state.Value, new int[3] { temporaryCode[0], temporaryCode[1], temporaryCode[2] });
-        GameHandler.Instance.MakeMove(transform.position, state.Value, temporaryCode);
-        //code = temporaryCode;
-        //MultiplayerGameManager.instance.DoMove(transform.position, state.Value, code);
-    }
+    //public void Dice()
+    //{
+    //    //gameObject.tag = "Dice";
+    //    //gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+    //    //for (int i = 0; i < code.Count; i++) {
+    //    //    code[i] = temporaryCode[i];
+    //    //}
+    //    //RewriteCodeRpc();
+    //    for (int i = 0; i < code.Count; i++)
+    //    {
+    //        SetCodeRpc(i, temporaryCode[i]);
+    //    }
+    //    //Debug.Log("CODE = " + code[0] + ", " + code[1] + ", " + code[2]);
+    //    //Debug.Log("TEMP CODE = " + temporaryCode[0] + ", " + temporaryCode[1] + ", " + temporaryCode[2]);
+    //    //MultiplayerGameManager.Instance.DoMove(transform.position, state.Value, new int[3] { temporaryCode[0], temporaryCode[1], temporaryCode[2] });
+    //    GameHandler.Instance.MakeMove(transform.position, state.Value, temporaryCode);
+    //    //code = temporaryCode;
+    //    //MultiplayerGameManager.instance.DoMove(transform.position, state.Value, code);
+    //}
 
-    private void Awake()
-    {
-        //code = new int[3] { -1, -1, -1 };
-        temporaryCode = new int[3] { -1, -1, -1 };
-        //state.Value = false;
-    }
+    //private void Awake()
+    //{
+    //    //code = new int[3] { -1, -1, -1 };
+    //    temporaryCode = new int[3] { -1, -1, -1 };
+    //    //state.Value = false;
+    //}
 
     private void OnMouseDown()
     {
@@ -89,11 +88,11 @@ public class Tile : NetworkBehaviour, ITile
         if (gameObject.CompareTag("Dice"))
             return;
         //Debug.Log("Clicked! " + transform.position);
-        Dice();
+        gameObject.GetComponent<ITile>().Dice();
         //MultiplayerGameManager.instance.Boob();
     }
 
-    private void ChangeColor(GameObject obj, Color color)
+    public void ChangeColor(GameObject obj, Color color)
     {
         obj.GetComponent<SpriteRenderer>().color = color;
         foreach (Transform child in obj.transform)

@@ -141,7 +141,7 @@ public class WinnerGraph : MonoBehaviour
 
     public void ShowScoreboard()
     {
-        for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
+        for (int i = 0; i < GameHandler.Instance.gameManager.GetScores().Count; i++)
         {
             names[i].gameObject.SetActive(true);
             scores[i].gameObject.SetActive(true);

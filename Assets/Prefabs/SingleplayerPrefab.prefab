@@ -44,3 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 549a7eda7af769a41bf815467c220995, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentIdTurn: 0
+  scores: 
+  winners: 
+  tilePrefab: {fileID: 6210486218339981673, guid: 619c900c850ab3a40870a8bbafb2b0cd, type: 3}

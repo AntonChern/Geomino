@@ -12,6 +12,8 @@ public class GameHandler : MonoBehaviour
 
     public IGameManager gameManager;
 
+    //private int players;
+
     private void Awake()
     {
         Instance = this;
@@ -53,5 +55,10 @@ public class GameHandler : MonoBehaviour
     public void HandleButton(int index, int[] code)
     {
         gameManager.HandleButton(index, code);
+    }
+
+    public void MakeComputerMove()
+    {
+        gameManager.MakeComputerMove();
     }
 }

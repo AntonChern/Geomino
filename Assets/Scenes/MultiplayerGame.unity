@@ -3761,6 +3761,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1377155945}
   m_CullTransparentMesh: 1
+--- !u!1 &1388788977
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1388788979}
+  m_Layer: 0
+  m_Name: BoardSingleplayer
+  m_TagString: Board
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1388788979
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1388788977}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1430023101
 GameObject:
   m_ObjectHideFlags: 0
@@ -4901,7 +4932,7 @@ GameObject:
   - component: {fileID: 1781173368}
   - component: {fileID: 1781173369}
   m_Layer: 0
-  m_Name: Board
+  m_Name: BoardMultiplayer
   m_TagString: Board
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6162,6 +6193,7 @@ SceneRoots:
   - {fileID: 1985808030}
   - {fileID: 689133313}
   - {fileID: 1781173368}
+  - {fileID: 1388788979}
   - {fileID: 325459404}
   - {fileID: 1578903531}
   - {fileID: 416556825}

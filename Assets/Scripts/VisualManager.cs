@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -111,7 +112,7 @@ public class VisualManager : MonoBehaviour
             SetLayer(hit.gameObject, LayerMask.NameToLayer("Default"));
             for (int i = 0; i < code.Length; i++)
             {
-                hit.gameObject.GetComponent<Tile>().SetCodeRpc(i, code[i]);
+                //hit.gameObject.GetComponent<Tile>().SetCodeRpc(i, code[i]);
                 hit.transform.GetChild(i).gameObject.GetComponent<SpriteRenderer>().sprite = pointSprites[code[i]];
             }
         }
@@ -123,9 +124,10 @@ public class VisualManager : MonoBehaviour
 
         for (int i = 0; i < chosenCode.Length; i++)
         {
-            place.transform.GetChild(i).gameObject.GetComponent<SpriteRenderer>().sprite = pointSprites[chosenCode[(i + offset) % chosenCode.Length]];
             //place.GetComponent<Tile>().temporaryCode[i] = chosenCode[(i + offset) % chosenCode.Length];
+            place.transform.GetChild(i).gameObject.GetComponent<SpriteRenderer>().sprite = pointSprites[chosenCode[(i + offset) % chosenCode.Length]];
             place.GetComponent<ITile>().SetTemporaryCode(i, chosenCode[(i + offset) % chosenCode.Length]);
+            //Debug.Log($"{i} {place.transform.GetChild(i).name} {pointSprites[chosenCode[(i + offset) % chosenCode.Length]].name}");
         }
     }
 
@@ -181,20 +183,125 @@ public class VisualManager : MonoBehaviour
         CheckMoves();
     }
 
+    public void ReturnHandledComputerButton(int index, bool playableDice)
+    {
+        if (!playableDice)
+        {
+            DecreaseAvailableDice();
+        }
+    }
+
+    private bool PlayableComputerCode(int[] code)
+    {
+        Transform board = GameObject.FindGameObjectWithTag("Board").transform;
+        //bool playableDice = false;
+        //Debug.Log("playableDice");
+        for (int j = 0; j < board.childCount; j++)
+        {
+            //Debug.Log("Inside loop 2 " + j);
+            GameObject place = board.GetChild(j).gameObject;
+            if (!place.CompareTag("Place"))
+                continue;
+            if (Suits(place, code))
+            {
+                //playableDice = true;
+                return true;
+            }
+        }
+        return false;
+        //if (currentIdTurn == 0)
+        //{
+        //    VisualManager.Instance.ReturnHandledButton(index, playableDice);
+        //}
+        //else
+        //{
+        //    VisualManager.Instance.ReturnHandledComputerButton(index, playableDice);
+        //    if (!playableDice) disabledComputerDices.Add(index);
+        //}
+    }
+
+    public void CheckComputerMoves(int[][] hand)
+    {
+        int availableDice = panel.Length;
+        //Debug.Log($"CheckComputerMoves {string.Join(" ", hand.Select(value => value != null))}");
+        for (int i = 0; i < panel.Length; i++)
+        {
+            int[] code = hand[i];
+            if (code == null || !PlayableComputerCode(code))
+            {
+                //DecreaseAvailableDice();
+                availableDice--;
+            }
+
+            //GameHandler.Instance.HandleButton(i, code);
+            // на сервере вызываем метод, передаём clientId и code, он обратно вызывает у нас метод, который либо энейблит эту кнопку, либо нет
+            //HandleButtonRpc(NetworkManager.Singleton.LocalClientId, i, code);
+        }
+        //Debug.Log($"{availableDice}");
+        if (availableDice == 0)
+        {
+            //MultiplayerGameManager.Instance.SkipMoveRpc();
+            // skip move
+            GameHandler.Instance.SkipMove();
+        }
+        else
+        {
+            GameHandler.Instance.MakeComputerMove();
+        }
+    }
+
+    private bool PlayableCode(int index, int[] code)
+    {
+        Transform board = GameObject.FindGameObjectWithTag("Board").transform;
+        //bool playableDice = false;
+        //Debug.Log("playableDice");
+        for (int j = 0; j < board.childCount; j++)
+        {
+            //Debug.Log("Inside loop 2 " + j);
+            GameObject place = board.GetChild(j).gameObject;
+            if (!place.CompareTag("Place"))
+                continue;
+            if (Suits(place, code))
+            {
+                //playableDice = true;
+                panel[index].GetComponent<DiceUI>().Enable();
+                return true;
+            }
+        }
+        panel[index].GetComponent<DiceUI>().Disable();
+        return false;
+        //if (currentIdTurn == 0)
+        //{
+        //    VisualManager.Instance.ReturnHandledButton(index, playableDice);
+        //}
+        //else
+        //{
+        //    VisualManager.Instance.ReturnHandledComputerButton(index, playableDice);
+        //    if (!playableDice) disabledComputerDices.Add(index);
+        //}
+    }
+
     private void CheckMoves()
     {
-        availableDice = 4;
+        int availableDice = panel.Length;
         for (int i = 0; i < panel.Length; i++)
         {
             int[] code = panelCodes[i];
-            if (code == null)
+            if (code == null || !PlayableCode(i, code))
             {
-                DecreaseAvailableDice();
-                continue;
+                //Debug.Log($"disabled {i}");
+                //DecreaseAvailableDice();
+                //continue;
+                availableDice--;
             }
-            GameHandler.Instance.HandleButton(i, code);
+            //GameHandler.Instance.HandleButton(i, code);
             // на сервере вызываем метод, передаём clientId и code, он обратно вызывает у нас метод, который либо энейблит эту кнопку, либо нет
             //HandleButtonRpc(NetworkManager.Singleton.LocalClientId, i, code);
+        }
+        //Debug.Log($"PLAYER {availableDice}");
+        if (availableDice == 0)
+        {
+            GameHandler.Instance.SkipMove();
         }
     }
 
@@ -263,7 +370,7 @@ public class VisualManager : MonoBehaviour
     {
         //chosenCode = code;
         pressed = index;
-        Debug.Log($"Chosen one {code}");
+        //Debug.Log($"Chosen one {code}");
         Transform board = GameObject.FindGameObjectWithTag("Board").transform;
         for (int i = 0; i < board.childCount; i++)
         {

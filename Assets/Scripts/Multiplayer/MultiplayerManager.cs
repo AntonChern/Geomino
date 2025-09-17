@@ -19,7 +19,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     public NetworkList<int> winners = new NetworkList<int>();
 
     private List<int[]> bag;
-    public List<int[]> history = new List<int[]>();
+    private List<int[]> history = new List<int[]>();
 
     [SerializeField] private Transform tilePrefab;
     //[SerializeField] private GameObject winnerGraph;
@@ -33,6 +33,14 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         Instance = this;
 
         GameHandler.Instance.gameManager = this;
+
+        foreach (var board in GameObject.FindGameObjectsWithTag("Board"))
+        {
+            if (board.name == "BoardSingleplayer")
+            {
+                Destroy(board);
+            }
+        }
     }
 
     private void Start()
@@ -150,7 +158,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
 
     private void StartGame()
     {
-        Debug.Log($"Start Game");
+        //Debug.Log($"Start Game");
 
         GenerateBag();
         InitiateScores();
@@ -298,7 +306,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
                 //Debug.Log(targetCoordinates);
                 //Debug.Log("SetCodeRpc " + index + ", " + value);
                 //hit.gameObject.GetComponent<Tile>().code[index] = value;
-                hit.gameObject.GetComponent<Tile>().SetCodeRpc(index, value);
+                hit.gameObject.GetComponent<MultiplayerTile>().SetCodeRpc(index, value);
             }
         }
     }
@@ -314,8 +322,9 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     {
         //Debug.Log("SpawnPlace");
         Transform tile = Instantiate(tilePrefab, position, Quaternion.Euler(0f, 0f, state ? 180 : 0));
+        //Destroy(tile.gameObject.GetComponent<SingleplayerTile>());
         tile.GetComponent<NetworkObject>().Spawn(true);
-        tile.GetComponent<Tile>().SetState(state);
+        tile.GetComponent<ITile>().SetState(state);
         tile.SetParent(GameObject.FindGameObjectWithTag("Board").transform);
         //tile.gameObject.GetComponent<Tile>().code[index] = value;
     }
@@ -323,7 +332,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     private void GenerateBag()
     {
         int colors = 7;
-        int maxNumber = 16;
+        //int maxNumber = 2;
         bag = new List<int[]>();
         for (int i = 0; i < colors; i++)
         {
@@ -333,10 +342,10 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
                 {
                     bag.Add(new int[3] { i, j, k });
                     bag.Add(new int[3] { i, k, j });
-                    if (bag.Count >= maxNumber)
-                    {
-                        return;
-                    }
+                    //if (bag.Count >= maxNumber)
+                    //{
+                    //    return;
+                    //}
                 }
             }
         }
@@ -407,7 +416,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
             GameObject place = board.GetChild(j).gameObject;
             if (!place.CompareTag("Place"))
                 continue;
-            if (Suits(new int[3] { place.GetComponent<Tile>().code[0], place.GetComponent<Tile>().code[1], place.GetComponent<Tile>().code[2] }, code))
+            if (Suits(place.GetComponent<ITile>().GetCode(), code))
             {
                 playableDice = true;
                 break;
@@ -529,8 +538,13 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         VisualManager.Instance.HidePlaces();
     }
 
-    public bool RefreshHand()
+    public void MakeComputerMove()
     {
-        return true;
+        throw new System.NotImplementedException();
     }
+
+    //public bool RefreshHand()
+    //{
+    //    return true;
+    //}
 }

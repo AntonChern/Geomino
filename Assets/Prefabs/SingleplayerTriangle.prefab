@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1769862881463169776}
   - component: {fileID: 614203737319543075}
   - component: {fileID: 1785833961941150237}
+  - component: {fileID: 1807770710110011194}
   m_Layer: 6
   m_Name: SingleplayerTriangle
   m_TagString: Place
@@ -154,7 +155,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc7e350ea2d77024395d4581a27f78c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &1807770710110011194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2568360331854133922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfd84cfda1f99884292eeaabf16e52fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  code: ffffffffffffffffffffffff
   temporaryCode: 
 --- !u!1 &3354982107046056800
 GameObject:
@@ -166,7 +179,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7881311923576310387}
   - component: {fileID: 6113923228693255072}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -253,7 +266,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8438901182589452508}
   - component: {fileID: 9126246973227506216}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Down
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -340,7 +353,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5771735610062202372}
   - component: {fileID: 5258352697875839215}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}

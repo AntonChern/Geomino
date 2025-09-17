@@ -790,7 +790,7 @@ public class GameVisualManager : NetworkBehaviour
                 //Debug.Log(targetCoordinates);
                 //Debug.Log("SetCodeRpc " + index + ", " + value);
                 //hit.gameObject.GetComponent<Tile>().code[index] = value;
-                hit.gameObject.GetComponent<Tile>().SetCodeRpc(index, value);
+                //hit.gameObject.GetComponent<Tile>().SetCodeRpc(index, value);
             }
         }
     }
@@ -889,7 +889,7 @@ public class GameVisualManager : NetworkBehaviour
             for (int i = 0; i < code.Length; i++)
             {
                 //hit.gameObject.GetComponent<Tile>().code[i] = code[i];
-                hit.gameObject.GetComponent<Tile>().SetCodeRpc(i, code[i]);
+                //hit.gameObject.GetComponent<Tile>().SetCodeRpc(i, code[i]);
                 hit.transform.GetChild(i).gameObject.GetComponent<SpriteRenderer>().sprite = sprites[code[i]];
             }
         }
@@ -901,7 +901,7 @@ public class GameVisualManager : NetworkBehaviour
         //Debug.Log("SpawnPlace");
         Transform tile = Instantiate(tilePrefab, position, Quaternion.Euler(0f, 0f, state ? 180 : 0));
         tile.GetComponent<NetworkObject>().Spawn(true);
-        tile.GetComponent<Tile>().SetState(state);
+        //tile.GetComponent<Tile>().SetState(state);
         tile.SetParent(GameObject.FindGameObjectWithTag("Board").transform);
         //tile.gameObject.GetComponent<Tile>().code[index] = value;
     }
@@ -955,7 +955,7 @@ public class GameVisualManager : NetworkBehaviour
 
     private void Try(GameObject place, int offset)
     {
-        int[] code = new int[3] { place.GetComponent<Tile>().code[0], place.GetComponent<Tile>().code[1], place.GetComponent<Tile>().code[2] };
+        //int[] code = new int[3] { place.GetComponent<Tile>().code[0], place.GetComponent<Tile>().code[1], place.GetComponent<Tile>().code[2] };
         int[] diceCode = MultiplayerGameManager.Instance.chosenCode;
         //int offset = 0;
         //for (int i = 0; i < place.transform.childCount; i++)
@@ -975,7 +975,7 @@ public class GameVisualManager : NetworkBehaviour
         {
             //Debug.Log("DiceCode = " + diceCode[0] + ", " + diceCode[1] + ", " + diceCode[2] + "; offset = " + offset);
             place.transform.GetChild(i).gameObject.GetComponent<SpriteRenderer>().sprite = sprites[diceCode[(i + offset) % diceCode.Length]];
-            place.GetComponent<Tile>().temporaryCode[i] = diceCode[(i + offset) % diceCode.Length];
+            //place.GetComponent<Tile>().temporaryCode[i] = diceCode[(i + offset) % diceCode.Length];
         }
         //for (int i = 0; i < place.transform.childCount; i++)
         //{
@@ -1013,7 +1013,7 @@ public class GameVisualManager : NetworkBehaviour
     private bool Suits(GameObject place)
     {
         //int[] code = place.GetComponent<Tile>().code;
-        int[] code = new int[3] { place.GetComponent<Tile>().code[0], place.GetComponent<Tile>().code[1], place.GetComponent<Tile>().code[2] };
+        //int[] code = new int[3] { place.GetComponent<Tile>().code[0], place.GetComponent<Tile>().code[1], place.GetComponent<Tile>().code[2] };
         int[] diceCode = MultiplayerGameManager.Instance.chosenCode;
 
         //Debug.Log("DiceCode Length = " + diceCode.Length);
@@ -1024,11 +1024,11 @@ public class GameVisualManager : NetworkBehaviour
             bool result = true;
             for (int j = 0; j < diceCode.Length; j++)
             {
-                if (code[j] != diceCode[(j + i) % diceCode.Length] && code[j] != -1)
-                {
-                    result = false;
-                    break;
-                }
+                //if (code[j] != diceCode[(j + i) % diceCode.Length] && code[j] != -1)
+                //{
+                //    result = false;
+                //    break;
+                //}
             }
             //return true;
             if (result)
@@ -1138,11 +1138,11 @@ public class GameVisualManager : NetworkBehaviour
             GameObject place = board.GetChild(j).gameObject;
             if (!place.CompareTag("Place"))
                 continue;
-            if (Suits(new int[3] { place.GetComponent<Tile>().code[0], place.GetComponent<Tile>().code[1], place.GetComponent<Tile>().code[2] }, code))
-            {
-                playableDice = true;
-                break;
-            }
+            //if (Suits(new int[3] { place.GetComponent<Tile>().code[0], place.GetComponent<Tile>().code[1], place.GetComponent<Tile>().code[2] }, code))
+            //{
+            //    playableDice = true;
+            //    break;
+            //}
             //Debug.Log(string.Join("", code));
             //for (int k = 0; k < place.GetComponent<Tile>().GetFacesNumber(); k++)
             //{

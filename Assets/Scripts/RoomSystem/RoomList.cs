@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using Unity.Services.Multiplayer;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class RoomList : MonoBehaviour
@@ -8,6 +9,7 @@ public class RoomList : MonoBehaviour
     public static RoomList Instance;
 
     [SerializeField] private Button createRoomButton;
+    [SerializeField] private Button backButton;
     //[SerializeField] private Button joinRoomButton;
     [SerializeField] private Button updateButton;
     //[SerializeField] private TMP_InputField joinCode;
@@ -27,6 +29,10 @@ public class RoomList : MonoBehaviour
             //RoomManager.Instance.CreateSession();
             Hide();
             CreateRoom.Instance.Show();
+        });
+        backButton.onClick.AddListener(() =>
+        {
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
         });
         //joinRoomButton.onClick.AddListener(() =>
         //{
