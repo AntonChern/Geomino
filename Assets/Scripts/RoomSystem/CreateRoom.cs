@@ -12,6 +12,7 @@ public class CreateRoom : MonoBehaviour
     [SerializeField] private TMP_InputField roomName;
     [SerializeField] private TMP_Dropdown players;
     [SerializeField] private Toggle isPrivate;
+    [SerializeField] private TMP_Dropdown map;
 
     private void Awake()
     {
@@ -30,6 +31,27 @@ public class CreateRoom : MonoBehaviour
         {
             Cancel();
         });
+        map.onValueChanged.AddListener((int value) =>
+        {
+            switch (map.options[value].text)
+            {
+                case "Бесконечная":
+                    PlayerPrefs.SetString("map", "infinity");
+                    break;
+                case "Коридор":
+                    PlayerPrefs.SetString("map", "hallway");
+                    break;
+                case "Гексагон":
+                    PlayerPrefs.SetString("map", "hexagon");
+                    break;
+                case "Колонны":
+                    PlayerPrefs.SetString("map", "columns");
+                    break;
+            }
+            PlayerPrefs.Save();
+        });
+        PlayerPrefs.SetString("map", "infinity");
+        PlayerPrefs.Save();
 
         Hide();
 

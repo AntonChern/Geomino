@@ -9,7 +9,7 @@ public class SingleplayerMenu : MonoBehaviour
     [SerializeField] private Button cancelButton;
     [SerializeField] private TMP_InputField playerName;
     [SerializeField] private TMP_Dropdown computers;
-    [SerializeField] private TMP_Dropdown maps;
+    [SerializeField] private TMP_Dropdown map;
 
     private void Start()
     {
@@ -32,9 +32,9 @@ public class SingleplayerMenu : MonoBehaviour
             PlayerPrefs.SetInt("players", int.Parse(computers.options[value].text) + 1);
             PlayerPrefs.Save();
         });
-        maps.onValueChanged.AddListener((int value) =>
+        map.onValueChanged.AddListener((int value) =>
         {
-            switch (maps.options[value].text)
+            switch (map.options[value].text)
             {
                 case "Бесконечная":
                     PlayerPrefs.SetString("map", "infinity");

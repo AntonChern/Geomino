@@ -3264,7 +3264,7 @@ MonoBehaviour:
   cancelButton: {fileID: 155857752}
   playerName: {fileID: 1114679279}
   computers: {fileID: 1479405984}
-  maps: {fileID: 162113673}
+  map: {fileID: 162113673}
 --- !u!1 &836466665
 GameObject:
   m_ObjectHideFlags: 0
