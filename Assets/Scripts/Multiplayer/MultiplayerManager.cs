@@ -246,7 +246,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     {
         DiceRpc(position, code);
 
-        Collider2D hit = Physics2D.OverlapPoint(position);
+        //Collider2D hit = Physics2D.OverlapPoint(position);
 
         float originAngle = (state ? Mathf.PI : 0) - Mathf.PI / 2;
         //move++;

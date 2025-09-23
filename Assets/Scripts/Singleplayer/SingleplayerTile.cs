@@ -27,6 +27,12 @@ public class SingleplayerTile : MonoBehaviour, ITile
         }
     }
 
+    public int[] GetTemporaryCode()
+    {
+        return temporaryCode;
+        //transform.GetChild(index).gameObject.GetComponent<SpriteRenderer>().sprite = pointSprites[value];
+    }
+
     public void SetTemporaryCode(int index, int value)
     {
         temporaryCode[index] = value;

@@ -1,7 +1,4 @@
 using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
-using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,6 +11,8 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     private int skippedPlayers = 0;
 
     public int currentIdTurn = 0;
+
+    private List<(int, int, float)> availableMoves = new List<(int, int, float)>();
 
     public event System.Action<int> OnCurrentIdTurnChanged;
     public int CurrentIdTurn
@@ -177,6 +176,16 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         Vector2 position = Vector2.zero;
         SpawnPlace(position, false);
         ConstructTilesAround(position, false, new int[3] { 0, 0, 0 });
+
+        Collider2D hit = Physics2D.OverlapPoint(position);
+
+        if (hit != null)
+        {
+            for (int i = 0; i < faces; i++)
+            {
+                hit.gameObject.GetComponent<SingleplayerTile>().SetCode(i, 0);
+            }
+        }
     }
 
     private void Dice(Vector2 position, int[] code)
@@ -214,7 +223,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     {
         Dice(position, code);
 
-        Collider2D hit = Physics2D.OverlapPoint(position);
+        //Collider2D hit = Physics2D.OverlapPoint(position);
 
         float originAngle = (state ? Mathf.PI : 0) - Mathf.PI / 2;
         //move++;
@@ -381,16 +390,231 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         //}
     }
 
+    private int CountDicesInPractice(int[] code)
+    {
+        int dicesInPractice = 0;
+        Transform board = GameObject.FindGameObjectWithTag("Board").transform;
+        for (int i = 0; i < board.childCount; i++)
+        {
+            GameObject dice = board.GetChild(i).gameObject;
+            if (!dice.CompareTag("Dice"))
+                continue;
+            dicesInPractice++;
+        }
+        return dicesInPractice;
+    }
+
+    private int CountSuitableDicesInPractice(int[] code)
+    {
+        int suitableDicesInPractice = 0;
+        Transform board = GameObject.FindGameObjectWithTag("Board").transform;
+        for (int i = 1; i < board.childCount; i++)
+        {
+            GameObject dice = board.GetChild(i).gameObject;
+            if (!dice.CompareTag("Dice"))
+                continue;
+            if (Suits(code, dice.GetComponent<ITile>().GetCode()))
+            {
+                //Debug.Log($"DICE {i}");
+                suitableDicesInPractice++;
+            }
+        }
+        //int gaga = 0;
+        foreach (int[] diceCode in hands[currentIdTurn - 1])
+        {
+            if (diceCode == null) continue;
+            if (Suits(code, diceCode))
+            {
+                //Debug.Log($"GAGA {gaga}");
+                suitableDicesInPractice++;
+            }
+            //gaga++;
+        }
+        return suitableDicesInPractice;
+    }
+
+    private int CountSuitableDicesInTheory(int[] code)
+    {
+        int suitableDicesInTheory = 0;
+        int colors = 7;
+        for (int i = 0; i < colors; i++)
+        {
+            for (int j = i + 1; j < colors; j++)
+            {
+                for (int k = j + 1; k < colors; k++)
+                {
+                    if (Suits(code, new int[3] { i, j, k }))
+                    {
+                        suitableDicesInTheory++;
+                    }
+                    if (Suits(code, new int[3] { i, k, j }))
+                    {
+                        suitableDicesInTheory++;
+                    }
+                }
+            }
+        }
+        return suitableDicesInTheory;
+    }
+
+    private float CountProbabilityForPlace(int[] code)
+    {
+        // кол-во костяшек, вкл code в теории - кол-во костяшек, вкл code на доске и на руке у текущего компа
+        // разделить
+        // 71 - (кол-во костяшек на доске + 4)
+        //int SuitableDicesInTheory = 0;
+        //int SuitableDicesInPractice = 0;
+        //int DicesInTheory = 0;
+        //int DicesInPractice = 0;
+
+        if ((float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (4 + CountDicesInPractice(code))) < 0f)
+        {
+            Debug.Log($"Prob {(float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (4 + CountDicesInPractice(code)))}");
+        }
+        return (float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (4 + CountDicesInPractice(code)));
+    }
+
+    private float CountValueForPlace(GameObject place)
+    {
+        float result = 0f;
+        float originAngle = (place.GetComponent<ITile>().GetState() ? Mathf.PI : 0) - Mathf.PI / 2;
+        for (int i = 0; i < faces; i++)
+        {
+            float angle = originAngle + 2 * Mathf.PI * i / faces;
+            Vector2 targetCoordinates = new Vector2(place.transform.position.x, place.transform.position.y) + CoordinateConverter.PolarToCartesian(1f / Mathf.Sqrt(3), angle);
+
+            Collider2D hitCollider = Physics2D.OverlapPoint(targetCoordinates);
+
+            if (hitCollider != null)
+            {
+                if (hitCollider.CompareTag("Dice"))
+                {
+                    result += place.GetComponent<ITile>().GetCode()[i];
+                }
+            }
+        }
+        return result;
+    }
+
+    private void CalculateMovesForDiceAndPlace(int diceIndex, int placeIndex, int[] code)
+    {
+        Transform board = GameObject.FindGameObjectWithTag("Board").transform;
+        GameObject candidatePlace = board.GetChild(placeIndex).gameObject;
+        float value = 0f;
+        float originAngle = (candidatePlace.GetComponent<ITile>().GetState() ? Mathf.PI : 0) - Mathf.PI / 2;
+        for (int i = 0; i < faces; i++)
+        {
+            float angle = originAngle + 2 * Mathf.PI * i / faces;
+            Vector2 targetCoordinates = new Vector2(candidatePlace.transform.position.x, candidatePlace.transform.position.y) + CoordinateConverter.PolarToCartesian(1f / Mathf.Sqrt(3), angle);
+
+            Collider2D hitCollider = Physics2D.OverlapPoint(targetCoordinates);
+
+            if (hitCollider == null)
+            {
+                int[] placeCode = new int[3] { -1, -1, -1 }; ;
+                placeCode[i] = code[i];
+                value -= code[i] * CountProbabilityForPlace(placeCode);
+                //Debug.Log($"({CountSuitableDicesInTheory(placeCode)} - {CountSuitableDicesInPractice(placeCode)}) / ({71} - {4 + CountDicesInPractice(placeCode)}) = {(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode))} / {71 - (4 + CountDicesInPractice(placeCode))} = {(float)(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode)) / (71 - (4 + CountDicesInPractice(placeCode)))}");
+                //Debug.Log($"Value minus {code[i]} * {CountProbabilityForPlace(placeCode)} = {code[i] * CountProbabilityForPlace(placeCode)}");
+            }
+            else
+            {
+                if (hitCollider.CompareTag("Dice"))
+                {
+                    value += candidatePlace.GetComponent<ITile>().GetCode()[i];
+                    //Debug.Log($"Value plus {candidatePlace.GetComponent<ITile>().GetCode()[i]}");
+                }
+                if (hitCollider.CompareTag("Place"))
+                {
+                    int[] placeCode = hitCollider.GetComponent<ITile>().GetCode();
+                    placeCode[i] = code[i];
+
+                    value -= (CountValueForPlace(hitCollider.gameObject) + code[i]) * CountProbabilityForPlace(placeCode);
+                    //Debug.Log($"({CountSuitableDicesInTheory(placeCode)} - {CountSuitableDicesInPractice(placeCode)}) / ({71} - {4 + CountDicesInPractice(placeCode)}) = {(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode))} / {71 - (4 + CountDicesInPractice(placeCode))} = {(float)(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode)) / (71 - (4 + CountDicesInPractice(placeCode)))}");
+                    //Debug.Log($"Value minus {CountValueForPlace(hitCollider.gameObject) + code[i]} * {CountProbabilityForPlace(placeCode)} = {(CountValueForPlace(hitCollider.gameObject) + code[i]) * CountProbabilityForPlace(placeCode)}");
+                }
+            }
+        }
+
+        for (int i = 0; i < board.childCount; i++)
+        {
+            if (i == placeIndex) continue;
+
+            GameObject place = board.GetChild(i).gameObject;
+            if (!place.CompareTag("Place"))
+                continue;
+            // не учитывать те, что рядом с placeIndex
+            if (Vector2.Distance(place.transform.position, board.GetChild(placeIndex).position) < Mathf.Sqrt(3) / 3 + Mathf.Epsilon)
+            {
+                continue;
+            }
+            value -= CountValueForPlace(place) * CountProbabilityForPlace(place.GetComponent<ITile>().GetCode());
+            //Debug.Log($"({CountSuitableDicesInTheory(place.GetComponent<ITile>().GetCode())} - {CountSuitableDicesInPractice(place.GetComponent<ITile>().GetCode())}) / ({71} - {4 + CountDicesInPractice(place.GetComponent<ITile>().GetCode())}) = {(CountSuitableDicesInTheory(place.GetComponent<ITile>().GetCode()) - CountSuitableDicesInPractice(place.GetComponent<ITile>().GetCode()))} / {71 - (4 + CountDicesInPractice(place.GetComponent<ITile>().GetCode()))} = {(float)(CountSuitableDicesInTheory(place.GetComponent<ITile>().GetCode()) - CountSuitableDicesInPractice(place.GetComponent<ITile>().GetCode())) / (71 - (4 + CountDicesInPractice(place.GetComponent<ITile>().GetCode())))}");
+            //Debug.Log($"Value minus {CountValueForPlace(place)} * {CountProbabilityForPlace(place.GetComponent<ITile>().GetCode())} = {CountValueForPlace(place) * CountProbabilityForPlace(place.GetComponent<ITile>().GetCode())}");
+        }
+
+        availableMoves.Add((diceIndex, placeIndex, value));
+    }
+
+    private void CalculateMovesForDice(int diceIndex, int[] code)
+    {
+        Transform board = GameObject.FindGameObjectWithTag("Board").transform;
+        for (int i = 0; i < board.childCount; i++)
+        {
+            GameObject place = board.GetChild(i).gameObject;
+            if (!place.CompareTag("Place"))
+                continue;
+            if (VisualManager.Instance.Suits(place, code))
+            {
+                CalculateMovesForDiceAndPlace(diceIndex, i, place.GetComponent<SingleplayerTile>().GetTemporaryCode());
+            }
+        }
+    }
+
+    private (int, int) CalculateMove()
+    {
+        int[][] hand = hands[currentIdTurn - 1];
+        for (int i = 0; i < hand.Length; i++)
+        {
+            int[] code = hand[i];
+            if (code == null || disabledComputerDices.Contains(i)) continue;
+            //Debug.Log($"Dice for {string.Join(" ", code)}");
+            CalculateMovesForDice(i, code);
+        }
+        availableMoves.Sort((x, y) => y.Item3.CompareTo(x.Item3));
+        foreach (var s in availableMoves)
+        {
+            Debug.Log($"{s.Item1} {s.Item2} {s.Item3}");
+        }
+        Debug.Log("===========================================================================");
+        return (availableMoves[0].Item1, availableMoves[0].Item2);
+    }
+
     public void MakeComputerMove()
     {
         //for (int i = 0; i < players - 1; i++)
         //{
         //    Debug.Log($"{i + 1} Disabled Dices {string.Join(" ", disabledComputerDices)} {disabledComputerDices.Count}");
         //}
-        int index = GetPlayableDiceComputer();
+        for (int i = 0; i < players - 1; i++)
+        {
+            string res = "[";
+            for (int j = 0; j < 4; j++)
+            {
+                if (hands[i][j] == null) { res += "NULL, "; continue; }
+                res += string.Join(" ", hands[i][j]) + ", ";
+            }
+            res += "]";
+            Debug.Log($"{i + 1} {res}");
+        }
+        int diceIndex, placeIndex = 0;
+        (diceIndex, placeIndex) = CalculateMove();
+        //int index = GetPlayableDiceComputer();
         //Debug.Log($"INDEX {index}");
-        DiceComputer(hands[currentIdTurn - 1][index]);
-        hands[currentIdTurn - 1][index] = GetDice();
+        //DiceComputer(hands[currentIdTurn - 1][index]);
+        DiceComputer(diceIndex, placeIndex);
+        hands[currentIdTurn - 1][diceIndex] = GetDice();
+        availableMoves.Clear();
         // выбрать index в hands[currentTurnId]
         // поставить его на рандомное место
         // GetDice() в этот индекс
@@ -398,58 +622,85 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         ChangeTurn();
     }
 
-    private void DiceComputer(int[] code)
+    private void DiceComputer(int diceIndex, int placeIndex)
     {
-        Transform board = GameObject.FindGameObjectWithTag("Board").transform;
-        //Debug.Log("playableDice");
-        for (int j = 0; j < board.childCount; j++)
-        {
-            //Debug.Log("Inside loop 2 " + j);
-            GameObject place = board.GetChild(j).gameObject;
-            if (!place.CompareTag("Place"))
-                continue;
-            //if (VisualManager.Instance.Suits(place.GetComponent<ITile>().GetCode(), code))
-            if (VisualManager.Instance.Suits(place, code))
-            {
-                //Dice(place.transform.position, code);
-                place.GetComponent<SingleplayerTile>().SynchronizeCodes();
-                ConstructTilesAround(place.transform.position, place.GetComponent<SingleplayerTile>().GetState(), place.GetComponent<SingleplayerTile>().GetCode());
-                return;
-            }
-        }
+        GameObject place = GameObject.FindGameObjectWithTag("Board").transform.GetChild(placeIndex).gameObject;
+        VisualManager.Instance.Suits(place, hands[currentIdTurn - 1][diceIndex]);
+        place.GetComponent<SingleplayerTile>().SynchronizeCodes();
+        ConstructTilesAround(place.transform.position, place.GetComponent<SingleplayerTile>().GetState(), place.GetComponent<SingleplayerTile>().GetCode());
+
+
+        //Transform board = GameObject.FindGameObjectWithTag("Board").transform;
+        ////Debug.Log("playableDice");
+        //for (int j = 0; j < board.childCount; j++)
+        //{
+        //    //Debug.Log("Inside loop 2 " + j);
+        //    GameObject place = board.GetChild(j).gameObject;
+        //    if (!place.CompareTag("Place"))
+        //        continue;
+        //    //if (VisualManager.Instance.Suits(place.GetComponent<ITile>().GetCode(), code))
+        //    if (VisualManager.Instance.Suits(place, code))
+        //    {
+        //        //Dice(place.transform.position, code);
+        //        place.GetComponent<SingleplayerTile>().SynchronizeCodes();
+        //        ConstructTilesAround(place.transform.position, place.GetComponent<SingleplayerTile>().GetState(), place.GetComponent<SingleplayerTile>().GetCode());
+        //        return;
+        //    }
+        //}
     }
 
-    private int GetPlayableDiceComputer()
-    {
-        //Debug.Log($"GetPlayableDiceComputer");
-        //for (int i = 0; i < players - 1; i++)
-        //{
-        //    string res = "[";
-        //    for (int j = 0; j < 4; j++)
-        //    {
-        //        if (hands[i][j] == null) { res += "NULL, "; continue; }
-        //        res += string.Join(" ", hands[i][j]) + ", ";
-        //    }
-        //    res += "]";
-        //    Debug.Log($"{i + 1} {res}");
-        //}
-        int index = Random.Range(0, dices);
-        //int index = -1;
-        //Debug.Log($"{string.Join(" ", disabledComputerDices)}");
-        //for (int i = 0; i < 4; i++)
-        //{
-        //    if (hands[currentIdTurn - 1][i] != null && !disabledComputerDices.Contains(i))
-        //    {
-        //        index = i;
-        //        break;
-        //    }
-        //}
-        while (hands[currentIdTurn - 1][index] == null || disabledComputerDices.Contains(index))
-        {
-            index = Random.Range(0, dices);
-        }
-        return index;
-    }
+    //private void DiceComputer(int[] code)
+    //{
+    //    Transform board = GameObject.FindGameObjectWithTag("Board").transform;
+    //    //Debug.Log("playableDice");
+    //    for (int j = 0; j < board.childCount; j++)
+    //    {
+    //        //Debug.Log("Inside loop 2 " + j);
+    //        GameObject place = board.GetChild(j).gameObject;
+    //        if (!place.CompareTag("Place"))
+    //            continue;
+    //        //if (VisualManager.Instance.Suits(place.GetComponent<ITile>().GetCode(), code))
+    //        if (VisualManager.Instance.Suits(place, code))
+    //        {
+    //            //Dice(place.transform.position, code);
+    //            place.GetComponent<SingleplayerTile>().SynchronizeCodes();
+    //            ConstructTilesAround(place.transform.position, place.GetComponent<SingleplayerTile>().GetState(), place.GetComponent<SingleplayerTile>().GetCode());
+    //            return;
+    //        }
+    //    }
+    //}
+
+    //private int GetPlayableDiceComputer()
+    //{
+    //    //Debug.Log($"GetPlayableDiceComputer");
+    //    //for (int i = 0; i < players - 1; i++)
+    //    //{
+    //    //    string res = "[";
+    //    //    for (int j = 0; j < 4; j++)
+    //    //    {
+    //    //        if (hands[i][j] == null) { res += "NULL, "; continue; }
+    //    //        res += string.Join(" ", hands[i][j]) + ", ";
+    //    //    }
+    //    //    res += "]";
+    //    //    Debug.Log($"{i + 1} {res}");
+    //    //}
+    //    int index = Random.Range(0, dices);
+    //    //int index = -1;
+    //    //Debug.Log($"{string.Join(" ", disabledComputerDices)}");
+    //    //for (int i = 0; i < 4; i++)
+    //    //{
+    //    //    if (hands[currentIdTurn - 1][i] != null && !disabledComputerDices.Contains(i))
+    //    //    {
+    //    //        index = i;
+    //    //        break;
+    //    //    }
+    //    //}
+    //    while (hands[currentIdTurn - 1][index] == null || disabledComputerDices.Contains(index))
+    //    {
+    //        index = Random.Range(0, dices);
+    //    }
+    //    return index;
+    //}
 
     private void ChangeTurn()
     {
