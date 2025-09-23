@@ -222,6 +222,12 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         {
             float angle = originAngle + 2 * Mathf.PI * i / faces;
             Vector2 targetCoordinates = position + CoordinateConverter.PolarToCartesian(1f / Mathf.Sqrt(3), angle);
+
+            if (!MapManager.Instance.CanBePlaced(targetCoordinates))
+            {
+                continue;
+            }
+
             Collider2D hitCollider = Physics2D.OverlapPoint(targetCoordinates);
 
             if (hitCollider == null)

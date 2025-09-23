@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,7 @@ public class VisualManager : MonoBehaviour
     [SerializeField] private Button[] panel;
     private int[][] panelCodes;
     [SerializeField] private GameObject backPanel;
+    //[SerializeField] private GameObject aliens;
 
     private GameObject lastDice;
     //private GameObject[] dicesUI;
@@ -98,6 +100,7 @@ public class VisualManager : MonoBehaviour
             hit.gameObject.tag = "Dice";
             // refactor
             Color color = new Color(0.5f, 1f, 1f);
+            //Color color = Color.white;
             if (lastDice != null)
             {
                 hit.gameObject.GetComponent<ITile>().ChangeColor(color);
@@ -122,12 +125,14 @@ public class VisualManager : MonoBehaviour
     {
         //int[] code = place.GetComponent<ITile>().GetCode();
 
+        //place.transform.rotation = Quaternion.Euler(0f, 0f, (place.GetComponent<ITile>().GetState() ? 180f : 0f) + (place.GetComponent<ITile>().GetState() ? -1f : 1f) * 120f * offset);
         for (int i = 0; i < chosenCode.Length; i++)
         {
-            //place.GetComponent<Tile>().temporaryCode[i] = chosenCode[(i + offset) % chosenCode.Length];
             place.transform.GetChild(i).gameObject.GetComponent<SpriteRenderer>().sprite = pointSprites[chosenCode[(i + offset) % chosenCode.Length]];
             place.GetComponent<ITile>().SetTemporaryCode(i, chosenCode[(i + offset) % chosenCode.Length]);
-            //Debug.Log($"{i} {place.transform.GetChild(i).name} {pointSprites[chosenCode[(i + offset) % chosenCode.Length]].name}");
+            //place.GetComponent<ITile>().Rotate(offset);
+            //place.transform.GetChild(i).gameObject.GetComponent<SpriteRenderer>().sprite = pointSprites[chosenCode[i]];
+            //place.GetComponent<ITile>().SetTemporaryCode(i, chosenCode[i]);
         }
     }
 
@@ -246,8 +251,15 @@ public class VisualManager : MonoBehaviour
         }
         else
         {
-            GameHandler.Instance.MakeComputerMove();
+            StartCoroutine(moveWaiter());
+            //GameHandler.Instance.MakeComputerMove();
         }
+    }
+
+    IEnumerator moveWaiter()
+    {
+        yield return new WaitForSeconds(Random.Range(0f, 0.1f));
+        GameHandler.Instance.MakeComputerMove();
     }
 
     private bool PlayableCode(int index, int[] code)
@@ -364,6 +376,7 @@ public class VisualManager : MonoBehaviour
     public void HideBackPanel()
     {
         backPanel.SetActive(false);
+        //aliens.SetActive(false);
     }
 
     public void Choose(int index, int[] code)

@@ -30,11 +30,13 @@ public class DiceUI : MonoBehaviour
         {
             NullColors();
             ChangeColor(gameObject, Color.green);
+            //ChangeColor(gameObject, Color.yellow);
             VisualManager.Instance.Choose(index, code);
         });
         startButtonPosition = transform.position;
         newDiceAnimationTime = newDiceAnimationTimer;
-        //gameObject.GetComponent<Button>().enabled = false;
+
+        Disable();
     }
 
     private void FixedUpdate()

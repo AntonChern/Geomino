@@ -60,4 +60,15 @@ public class MultiplayerTile : NetworkBehaviour, ITile
         temporaryCode = new int[3] { -1, -1, -1 };
         //state.Value = false;
     }
+
+    public bool GetState()
+    {
+        return state.Value;
+    }
+
+    //public void Rotate(int offset)
+    //{
+    //    //transform.GetChild(3).rotation = Quaternion.Euler(0f, 0f, (state.Value ? 180f : 0f) + (state.Value ? -1f : 1f) * 120f * offset);
+    //    transform.GetChild(3).rotation = Quaternion.Euler(0f, 0f, (state.Value ? 180f : 0f) - 120f * offset);
+    //}
 }

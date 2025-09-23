@@ -4,15 +4,15 @@ using UnityEngine.InputSystem;
 public class Dragger : MonoBehaviour
 {
     private Vector3 dragOrigin;
-    private Vector2 backgroundOffset;
+    //private Vector2 backgroundOffset;
 
     //private float maxHeight;
     //private float maxWidth;
 
-    private void Start()
-    {
-        backgroundOffset = transform.GetChild(0).GetComponent<Renderer>().material.mainTextureOffset;
-    }
+    //private void Start()
+    //{
+    //    backgroundOffset = transform.GetChild(0).GetComponent<Renderer>().material.mainTextureOffset;
+    //}
 
     private void Update()
     {
@@ -36,8 +36,9 @@ public class Dragger : MonoBehaviour
             //transform.position = transform.position - offset;
             //Debug.Log(maxWidth + ", " + maxHeight);
 
-            backgroundOffset -= new Vector2(offset.x / transform.GetChild(0).transform.localScale.x, offset.y / transform.GetChild(0).transform.localScale.y);
-            transform.GetChild(0).GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
+            MapManager.Instance.DragBackground(offset);
+            //backgroundOffset -= new Vector2(offset.x / transform.GetChild(0).transform.localScale.x, offset.y / transform.GetChild(0).transform.localScale.y);
+            //transform.GetChild(0).GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
             //transform.GetChild(0).GetComponent<Renderer>().material.mainTextureOffset += new Vector2(Time.time, 0f);
         }
     }

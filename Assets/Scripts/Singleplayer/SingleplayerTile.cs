@@ -63,4 +63,10 @@ public class SingleplayerTile : MonoBehaviour, ITile
         temporaryCode = new int[3] { -1, -1, -1 };
         //state.Value = false;
     }
+
+    //public void Rotate(int offset)
+    //{
+    //    //transform.GetChild(3).rotation = Quaternion.Euler(0f, 0f, (state ? 180f : 0f) + (state ? -1f : 1f) * 120f * offset);
+    //    transform.GetChild(3).rotation = Quaternion.Euler(0f, 0f, (state ? 180f : 0f) - 120f * offset);
+    //}
 }

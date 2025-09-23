@@ -32,6 +32,9 @@ public class CreateRoom : MonoBehaviour
         });
 
         Hide();
+
+        isPrivate.gameObject.SetActive(false);
+
     }
 
     public void Cancel()

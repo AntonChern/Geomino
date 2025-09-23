@@ -113,6 +113,8 @@ public class Tile : MonoBehaviour//, ITile
         if (gameObject.CompareTag("Place"))
             //ChangeColor(gameObject, new Color(1f, 1f, 0f, 0.5f));
             ChangeColor(gameObject, Color.yellow);
+            //ChangeColor(gameObject, Color.white);
+
     }
 
     private void OnMouseExit()
