@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -467,11 +468,13 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         //int DicesInTheory = 0;
         //int DicesInPractice = 0;
 
-        if ((float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (4 + CountDicesInPractice(code))) < 0f)
+        if ((float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (hands[currentIdTurn - 1].Count(x => x != null) + CountDicesInPractice(code))) < 0f)
         {
+            Debug.Log($"{hands[currentIdTurn - 1].Count(x => x != null)}");
+            Debug.Log($"({CountSuitableDicesInTheory(code)} - {CountSuitableDicesInPractice(code)}) / ({71} - {hands[currentIdTurn - 1].Count(x => x != null) + CountDicesInPractice(code)}) = {(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code))} / {71 - (4 + CountDicesInPractice(code))} = {(float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (4 + CountDicesInPractice(code)))}");
             Debug.Log($"Prob {(float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (4 + CountDicesInPractice(code)))}");
         }
-        return (float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (4 + CountDicesInPractice(code)));
+        return (float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (hands[currentIdTurn - 1].Count(x => x != null) + CountDicesInPractice(code)));
     }
 
     private float CountValueForPlace(GameObject place)
@@ -582,11 +585,11 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
             CalculateMovesForDice(i, code);
         }
         availableMoves.Sort((x, y) => y.Item3.CompareTo(x.Item3));
-        foreach (var s in availableMoves)
-        {
-            Debug.Log($"{s.Item1} {s.Item2} {s.Item3}");
-        }
-        Debug.Log("===========================================================================");
+        //foreach (var s in availableMoves)
+        //{
+        //    Debug.Log($"{s.Item1} {s.Item2} {s.Item3}");
+        //}
+        //Debug.Log("===========================================================================");
         return (availableMoves[0].Item1, availableMoves[0].Item2);
     }
 
@@ -596,17 +599,17 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         //{
         //    Debug.Log($"{i + 1} Disabled Dices {string.Join(" ", disabledComputerDices)} {disabledComputerDices.Count}");
         //}
-        for (int i = 0; i < players - 1; i++)
-        {
-            string res = "[";
-            for (int j = 0; j < 4; j++)
-            {
-                if (hands[i][j] == null) { res += "NULL, "; continue; }
-                res += string.Join(" ", hands[i][j]) + ", ";
-            }
-            res += "]";
-            Debug.Log($"{i + 1} {res}");
-        }
+        //for (int i = 0; i < players - 1; i++)
+        //{
+        //    string res = "[";
+        //    for (int j = 0; j < 4; j++)
+        //    {
+        //        if (hands[i][j] == null) { res += "NULL, "; continue; }
+        //        res += string.Join(" ", hands[i][j]) + ", ";
+        //    }
+        //    res += "]";
+        //    Debug.Log($"{i + 1} {res}");
+        //}
         int diceIndex, placeIndex = 0;
         (diceIndex, placeIndex) = CalculateMove();
         //int index = GetPlayableDiceComputer();
