@@ -28,10 +28,18 @@ public class DiceUI : MonoBehaviour
     {
         gameObject.GetComponent<Button>().onClick.AddListener(() =>
         {
-            NullColors();
-            ChangeColor(gameObject, Color.green);
-            //ChangeColor(gameObject, Color.yellow);
-            VisualManager.Instance.Choose(index, code);
+            if (GetComponent<Image>().color == Color.green)
+            {
+                ChangeColor(gameObject, Color.white);
+                VisualManager.Instance.Unchoose();
+            }
+            else
+            {
+                NullColors();
+                ChangeColor(gameObject, Color.green);
+                //ChangeColor(gameObject, Color.yellow);
+                VisualManager.Instance.Choose(index, code);
+            }
         });
         startButtonPosition = transform.position;
         newDiceAnimationTime = newDiceAnimationTimer;

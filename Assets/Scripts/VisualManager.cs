@@ -1,3 +1,4 @@
+using Mono.Cecil.Cil;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
@@ -399,6 +400,19 @@ public class VisualManager : MonoBehaviour
             {
                 SetLayer(place, LayerMask.NameToLayer("Places"));
             }
+        }
+    }
+
+    public void Unchoose()
+    {
+        Transform board = GameObject.FindGameObjectWithTag("Board").transform;
+        for (int i = 0; i < board.childCount; i++)
+        {
+            GameObject place = board.GetChild(i).gameObject;
+            if (!place.CompareTag("Place"))
+                continue;
+
+            SetLayer(place, LayerMask.NameToLayer("Places"));
         }
     }
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class HexagonMap : MonoBehaviour, IMap
 {
-    //[SerializeField] private GameObject places;
+    [SerializeField] private GameObject places;
 
     private float radius = 4f * Mathf.Sqrt(3) / 2;
     private Vector2 offset = new Vector2(0f, Mathf.Sqrt(3) / 3);
@@ -11,9 +11,9 @@ public class HexagonMap : MonoBehaviour, IMap
 
     private void Awake()
     {
-        if (PlayerPrefs.GetString("map") != "hexagon")
+        if (PlayerPrefs.GetString("map") == "hexagon")
         {
-            gameObject.SetActive(false);
+            places.gameObject.SetActive(true);
         }
     }
 

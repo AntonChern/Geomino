@@ -2,23 +2,23 @@ using UnityEngine;
 
 public class HallwayMap : MonoBehaviour, IMap
 {
-    //[SerializeField] private GameObject places;
+    [SerializeField] private GameObject places;
     private Vector2 backgroundOffset;
 
     private float radius = 2.5f * Mathf.Sqrt(3) / 2;
 
     private void Awake()
     {
-        if (PlayerPrefs.GetString("map") != "hallway")
+        if (PlayerPrefs.GetString("map") == "hallway")
         {
-            gameObject.SetActive(false);
+            places.gameObject.SetActive(true);
         }
-        backgroundOffset = GetComponent<Renderer>().material.mainTextureOffset;
+        backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
     }
 
     private void PositionUpdate()
     {
-        transform.position = new Vector3(Camera.main.transform.position.x, transform.position.y, transform.position.z);
+        places.transform.position = new Vector3(Camera.main.transform.position.x, places.transform.position.y, places.transform.position.z);
     }
 
     public bool CanBePlaced(Vector2 position)
@@ -28,8 +28,8 @@ public class HallwayMap : MonoBehaviour, IMap
 
     public void DragMap(Vector2 offset)
     {
-        backgroundOffset -= new Vector2(offset.x / transform.localScale.x, 0f);
-        GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
+        backgroundOffset -= new Vector2(offset.x / places.transform.localScale.x, 0f);
+        places.GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
         PositionUpdate();
     }
 }

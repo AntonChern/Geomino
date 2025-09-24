@@ -228,6 +228,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
         float originAngle = (state ? Mathf.PI : 0) - Mathf.PI / 2;
         //move++;
+        int value = 0;
         for (int i = 0; i < faces; i++)
         {
             float angle = originAngle + 2 * Mathf.PI * i / faces;
@@ -245,21 +246,28 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
                 SpawnPlace(targetCoordinates, !state);
             }
             SetCode(targetCoordinates, i, code[i]);
-            UpdateScores(targetCoordinates, code[i]);
+            value += UpdateScores(targetCoordinates, code[i]);
         }
+        scores[currentIdTurn] += value;
+        OnScoresChanged();
+
+        if (value == 0) return;
+        WorldCanvas.Instance.SpawnScore(position, value);
     }
 
-    private void UpdateScores(Vector2 targetCoordinates, int value)
+    private int UpdateScores(Vector2 targetCoordinates, int value)
     {
         Collider2D hit = Physics2D.OverlapPoint(targetCoordinates);
         if (hit != null)
         {
             if (hit.CompareTag("Dice"))
             {
-                scores[currentIdTurn] += value;
-                OnScoresChanged();
+                return value;
+                //scores[currentIdTurn] += value;
+                //OnScoresChanged();
             }
         }
+        return 0;
     }
 
     private void OnScoresChanged()
@@ -470,6 +478,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
         if ((float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (hands[currentIdTurn - 1].Count(x => x != null) + CountDicesInPractice(code))) < 0f)
         {
+            Debug.Log($"code {string.Join(" ", code)}");
             Debug.Log($"{hands[currentIdTurn - 1].Count(x => x != null)}");
             Debug.Log($"({CountSuitableDicesInTheory(code)} - {CountSuitableDicesInPractice(code)}) / ({71} - {hands[currentIdTurn - 1].Count(x => x != null) + CountDicesInPractice(code)}) = {(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code))} / {71 - (4 + CountDicesInPractice(code))} = {(float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (4 + CountDicesInPractice(code)))}");
             Debug.Log($"Prob {(float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (4 + CountDicesInPractice(code)))}");
@@ -514,11 +523,14 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
             if (hitCollider == null)
             {
-                int[] placeCode = new int[3] { -1, -1, -1 }; ;
-                placeCode[i] = code[i];
-                value -= code[i] * CountProbabilityForPlace(placeCode);
-                //Debug.Log($"({CountSuitableDicesInTheory(placeCode)} - {CountSuitableDicesInPractice(placeCode)}) / ({71} - {4 + CountDicesInPractice(placeCode)}) = {(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode))} / {71 - (4 + CountDicesInPractice(placeCode))} = {(float)(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode)) / (71 - (4 + CountDicesInPractice(placeCode)))}");
-                //Debug.Log($"Value minus {code[i]} * {CountProbabilityForPlace(placeCode)} = {code[i] * CountProbabilityForPlace(placeCode)}");
+                if (MapManager.Instance.CanBePlaced(targetCoordinates))
+                {
+                    int[] placeCode = new int[3] { -1, -1, -1 }; ;
+                    placeCode[i] = code[i];
+                    value -= code[i] * CountProbabilityForPlace(placeCode);
+                    //Debug.Log($"({CountSuitableDicesInTheory(placeCode)} - {CountSuitableDicesInPractice(placeCode)}) / ({71} - {4 + CountDicesInPractice(placeCode)}) = {(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode))} / {71 - (4 + CountDicesInPractice(placeCode))} = {(float)(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode)) / (71 - (4 + CountDicesInPractice(placeCode)))}");
+                    //Debug.Log($"Value minus {code[i]} * {CountProbabilityForPlace(placeCode)} = {code[i] * CountProbabilityForPlace(placeCode)}");
+                }
             }
             else
             {
@@ -529,7 +541,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
                 }
                 if (hitCollider.CompareTag("Place"))
                 {
-                    int[] placeCode = hitCollider.GetComponent<ITile>().GetCode();
+                    int[] placeCode = (int[])hitCollider.GetComponent<ITile>().GetCode().Clone();
                     placeCode[i] = code[i];
 
                     value -= (CountValueForPlace(hitCollider.gameObject) + code[i]) * CountProbabilityForPlace(placeCode);

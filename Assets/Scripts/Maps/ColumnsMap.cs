@@ -4,23 +4,24 @@ using UnityEngine.UIElements;
 
 public class ColumnsMap : MonoBehaviour, IMap
 {
+    [SerializeField] private GameObject places;
     private Vector2 backgroundOffset;
     private float cameraOffset;
 
     private void Awake()
     {
-        if (PlayerPrefs.GetString("map") != "columns")
+        if (PlayerPrefs.GetString("map") == "columns")
         {
-            gameObject.SetActive(false);
+            places.gameObject.SetActive(true);
         }
 
-        backgroundOffset = GetComponent<Renderer>().material.mainTextureOffset;
-        cameraOffset = transform.position.y - Camera.main.transform.position.y; // =13/18
+        backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
+        cameraOffset = places.transform.position.y - Camera.main.transform.position.y; // =13/18
     }
 
     private void PositionUpdate()
     {
-        transform.position = new Vector3(Camera.main.transform.position.x, cameraOffset + Camera.main.transform.position.y, transform.position.z);
+        places.transform.position = new Vector3(Camera.main.transform.position.x, cameraOffset + Camera.main.transform.position.y, places.transform.position.z);
     }
 
     //private bool InsideCircle(Vector2 center, float radius, Vector2 point)
@@ -32,7 +33,7 @@ public class ColumnsMap : MonoBehaviour, IMap
     {
         if ((int)position.x == 0 && (int)position.y == 0 || (int)Mathf.Round(position.y / (Mathf.Sqrt(3) / 6)) % 3 != 0) return true;
         //Debug.Log($"{-3 % 3}");
-        Debug.Log($"{position} = {!((int)Mathf.Round(2f * position.y / Mathf.Sqrt(3)) % 2 == 0 && (int)Mathf.Round(position.x) % 3 == 0 || (int)Mathf.Round(2f * position.y / Mathf.Sqrt(3)) % 2 == 1 && ((int)Mathf.Round(position.x - 1.5f)) % 3 == 0)}, {Mathf.Round(2f * position.y / Mathf.Sqrt(3))} {Mathf.Round(position.x)} {Mathf.Round(position.x - 1.5f)}");
+        //Debug.Log($"{position} = {!((int)Mathf.Round(2f * position.y / Mathf.Sqrt(3)) % 2 == 0 && (int)Mathf.Round(position.x) % 3 == 0 || (int)Mathf.Round(2f * position.y / Mathf.Sqrt(3)) % 2 == 1 && ((int)Mathf.Round(position.x - 1.5f)) % 3 == 0)}, {Mathf.Round(2f * position.y / Mathf.Sqrt(3))} {Mathf.Round(position.x)} {Mathf.Round(position.x - 1.5f)}");
         return !((int)Mathf.Round(position.y / (Mathf.Sqrt(3) / 2)) % 2 == 0 && (int)Mathf.Round(position.x) % 3 == 0 ||
                  (int)Mathf.Round(position.y / (Mathf.Sqrt(3) / 2)) % 2 != 0 && ((int)Mathf.Round(position.x - 1.5f)) % 3 == 0);
         //return !((int)Mathf.Round(position.y / Mathf.Sqrt(3)) % 2 == 0 && (int)Mathf.Round(position.x) % 3 == 0 ||
@@ -41,8 +42,8 @@ public class ColumnsMap : MonoBehaviour, IMap
 
     public void DragMap(Vector2 offset)
     {
-        backgroundOffset -= new Vector2(offset.x / transform.localScale.x, offset.y / transform.localScale.y);
-        GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
+        backgroundOffset -= new Vector2(offset.x / places.transform.localScale.x, offset.y / places.transform.localScale.y);
+        places.GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
         PositionUpdate();
     }
 }

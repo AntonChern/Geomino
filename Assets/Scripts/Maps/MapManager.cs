@@ -33,7 +33,7 @@ public class MapManager : MonoBehaviour
 
         for (int i = 0; i < transform.childCount; i++)
         {
-            if (transform.GetChild(i).gameObject.activeInHierarchy)
+            if (transform.GetChild(i).GetChild(0).gameObject.activeInHierarchy)
             {
                 map = transform.GetChild(i).GetComponent<IMap>();
                 break;
