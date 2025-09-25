@@ -8,6 +8,7 @@ TagManager:
   - Dice
   - Board
   - DiceUI
+  - UIElement
   layers:
   - Default
   - TransparentFX

@@ -1,18 +1,35 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class Dragger : MonoBehaviour
 {
+    [SerializeField] private Button home;
+
     private Vector3 dragOrigin;
     //private Vector2 backgroundOffset;
 
     //private float maxHeight;
     //private float maxWidth;
+    private Vector3 initialPosition;
 
-    //private void Start()
-    //{
-    //    backgroundOffset = transform.GetChild(0).GetComponent<Renderer>().material.mainTextureOffset;
-    //}
+    private void Start()
+    {
+        initialPosition = transform.position;
+
+        home.onClick.AddListener(() =>
+        {
+            ResetPosition();
+        });
+        //backgroundOffset = transform.GetChild(0).GetComponent<Renderer>().material.mainTextureOffset;
+    }
+
+    private void ResetPosition()
+    {
+        Vector3 offset = initialPosition - transform.position;
+        transform.position = initialPosition;
+        MapManager.Instance.DragBackground(-offset);
+    }
 
     private void Update()
     {

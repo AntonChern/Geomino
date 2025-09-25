@@ -4,7 +4,7 @@ using UnityEngine;
 public class ScoreText : MonoBehaviour
 {
     private float elapsedTime = 0f;
-    private float animationTime = 1.5f;
+    private float animationTime = 2f;
     private float distance = 0.7f;
     private Vector3 initialPos = Vector3.zero;
 
@@ -40,8 +40,24 @@ public class ScoreText : MonoBehaviour
             case 6:
                 result = new Color(0.5f, 0f, 0.5f, 1f);
                 break;
-            default:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
                 result = new Color(0.75f, 0.75f, 0f, 1f);
+                break;
+            case 12:
+            case 13:
+            case 14:
+                result = new Color(1f, 0.5f, 0f, 1f);
+                break;
+            case 15:
+                result = new Color(1f, 0f, 0f, 1f);
+                break;
+            default:
+                //result = new Color(0.75f, 0.75f, 0f, 1f);
+                result = Color.white;
                 break;
         }
         return result;
