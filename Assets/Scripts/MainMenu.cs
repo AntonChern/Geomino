@@ -8,10 +8,10 @@ public class MainMenu : MonoBehaviour
 
     [SerializeField] private Button singleplayerButton;
     [SerializeField] private Button multiplayerButton;
-    [SerializeField] private Button exitButton;
+    //[SerializeField] private Button exitButton;
 
-    [SerializeField] private GameObject exitMessage;
-    [SerializeField] private SingleplayerMenu singleplayerMenu;
+    //[SerializeField] private GameObject exitMessage;
+    //[SerializeField] private SingleplayerMenu singleplayerMenu;
 
     private void Awake()
     {
@@ -23,16 +23,12 @@ public class MainMenu : MonoBehaviour
         singleplayerButton.onClick.AddListener(() =>
         {
             //SceneManager.LoadScene("MultiplayerGame", LoadSceneMode.Single);
-            singleplayerMenu.Show();
+            SingleplayerMenu.Instance.Show();
             Hide();
         });
         multiplayerButton.onClick.AddListener(() =>
         {
             SceneManager.LoadScene("RoomSystem", LoadSceneMode.Single);
-        });
-        exitButton.onClick.AddListener(() =>
-        {
-            exitMessage.SetActive(true);
         });
 
         if (RoomManager.Instance != null)
@@ -41,13 +37,14 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            exitMessage.SetActive(!exitMessage.activeInHierarchy);
-        }
-    }
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.Escape))
+    //    {
+    //        gameObject.SetActive(exitMessage.activeInHierarchy);
+    //        exitMessage.SetActive(!exitMessage.activeInHierarchy);
+    //    }
+    //}
 
     public void Show()
     {

@@ -5,11 +5,18 @@ using UnityEngine.UI;
 
 public class SingleplayerMenu : MonoBehaviour
 {
+    public static SingleplayerMenu Instance { get; private set; }
+
     [SerializeField] private Button startGameButton;
     [SerializeField] private Button cancelButton;
     [SerializeField] private TMP_InputField playerName;
     [SerializeField] private TMP_Dropdown computers;
     [SerializeField] private TMP_Dropdown map;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {

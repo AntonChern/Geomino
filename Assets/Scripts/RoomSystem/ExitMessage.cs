@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,7 @@ public class ExitMessage : MonoBehaviour
         cancelButton.onClick.AddListener(() =>
         {
             Hide();
+            MainMenu.Instance.Show();
         });
         Hide();
     }
