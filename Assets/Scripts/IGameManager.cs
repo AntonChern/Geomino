@@ -21,5 +21,7 @@ public interface IGameManager
     public List<int[]> GetHistory();
 
     public List<int> GetWinners();
+    
+    public void Exit();
 
 }

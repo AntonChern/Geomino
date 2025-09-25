@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEngine.Rendering.DebugUI;
 
 public class MultiplayerManager : NetworkBehaviour, IGameManager
 {
@@ -250,6 +251,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
 
         float originAngle = (state ? Mathf.PI : 0) - Mathf.PI / 2;
         //move++;
+        int value = 0;
         for (int i = 0; i < faces; i++)
         {
             float angle = originAngle + 2 * Mathf.PI * i / faces;
@@ -267,24 +269,36 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
                 SpawnPlaceRpc(targetCoordinates, !state);
             }
             SetCodeRpc(targetCoordinates, i, code[i]);
-            UpdateScoresRpc(NetworkManager.Singleton.LocalClientId, targetCoordinates, code[i]);
-        }
-    }
 
-    [Rpc(SendTo.Server)]
-    private void UpdateScoresRpc(ulong clientId, Vector2 targetCoordinates, int value)
-    {
-        Collider2D hit = Physics2D.OverlapPoint(targetCoordinates);
-        if (hit != null)
-        {
-            if (hit.CompareTag("Dice"))
+            hitCollider = Physics2D.OverlapPoint(targetCoordinates);
+            if (hitCollider != null && hitCollider.CompareTag("Dice"))
             {
-                UpdateScores(clientId, value);
+                value += code[i];
             }
         }
+        UpdateScoresRpc(NetworkManager.Singleton.LocalClientId, value);
+
+        if (value == 0) return;
+        WorldCanvas.Instance.SpawnScore(position, value);
     }
 
-    public void UpdateScores(ulong clientId, int value)
+    //[Rpc(SendTo.Server)]
+    //private int UpdateScoresRpc(Vector2 targetCoordinates, int value)
+    //{
+    //    Collider2D hit = Physics2D.OverlapPoint(targetCoordinates);
+    //    if (hit != null)
+    //    {
+    //        if (hit.CompareTag("Dice"))
+    //        {
+    //            return value;
+    //            //UpdateScores(clientId, value);
+    //        }
+    //    }
+    //    return 0;
+    //}
+
+    [Rpc(SendTo.Server)]
+    public void UpdateScoresRpc(ulong clientId, int value)
     {
         scores[(int)clientId] += value;
     }
@@ -547,6 +561,11 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     public void MakeComputerMove()
     {
         throw new System.NotImplementedException();
+    }
+
+    public void Exit()
+    {
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
     //public bool RefreshHand()

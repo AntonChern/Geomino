@@ -854,4 +854,9 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     {
         return winners;
     }
+
+    public void Exit()
+    {
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+    }
 }

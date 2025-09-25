@@ -10,6 +10,8 @@ public class GameHandler : MonoBehaviour
     [SerializeField] private GameObject multiplayerPrefab;
     [SerializeField] private GameObject singleplayerPrefab;
 
+    [SerializeField] private GameObject exitMessage;
+
     public IGameManager gameManager;
 
     //private int players;
@@ -60,5 +62,18 @@ public class GameHandler : MonoBehaviour
     public void MakeComputerMove()
     {
         gameManager.MakeComputerMove();
+    }
+
+    public void Exit()
+    {
+        gameManager.Exit();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            exitMessage.SetActive(!exitMessage.activeInHierarchy);
+        }
     }
 }
