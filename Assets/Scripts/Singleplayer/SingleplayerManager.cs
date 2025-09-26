@@ -39,6 +39,8 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
     [SerializeField] private Transform tilePrefab;
 
+    private Difficulty[] difficulties;
+
     private void Awake()
     {
         if (Instance != null)
@@ -73,9 +75,20 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         InitiateScores();
         SpawnInitialObject();
         GenerateHands();
+        SetDifficulties();
         ShowNames();
 
         HandleTurn();
+    }
+
+    private void SetDifficulties()
+    {
+        difficulties = new Difficulty[players - 1];
+        for (int i = 0; i < players - 1; i++)
+        {
+            //Debug.Log($"difficulty{i} {(Difficulty)PlayerPrefs.GetInt($"difficulty{i}")}");
+            difficulties[i] = (Difficulty)PlayerPrefs.GetInt($"difficulty{i}");
+        }
     }
 
     private void HandleTurn()
@@ -104,7 +117,8 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         for (int i = 0; i < players; i++)
         {
             //Debug.Log(i == 0 ? PlayerPrefs.GetString("playerName") : $"Компьютер {i}");
-            Scoreboard.Instance.SetPlayer(i, i == 0 ? PlayerPrefs.GetString("playerName") : $"Компьютер {i}");
+            //if (i != 0) Debug.Log($"{i - 1} {difficulties[i - 1]} {DifficultyHandler.Translate(difficulties[i - 1])}");
+            Scoreboard.Instance.SetPlayer(i, i == 0 ? PlayerPrefs.GetString("playerName") : $"Бот {DifficultyHandler.Translate(difficulties[i - 1])}");
         }
     }
 
@@ -602,7 +616,28 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         //    Debug.Log($"{s.Item1} {s.Item2} {s.Item3}");
         //}
         //Debug.Log("===========================================================================");
-        return (availableMoves[0].Item1, availableMoves[0].Item2);
+        return GetMoveByDifficulty();
+    }
+
+    private (int, int) GetMoveByDifficulty()
+    {
+        int index = 0;
+        switch (difficulties[currentIdTurn - 1])
+        {
+            case Difficulty.Easy:
+                index = Random.Range(0, availableMoves.Count - 1);
+                break;
+            case Difficulty.Medium:
+                index = Random.Range(availableMoves.Count / 4, availableMoves.Count / 2);
+                break;
+            case Difficulty.Hard:
+                index = Random.Range(0, availableMoves.Count / 2);
+                break;
+            case Difficulty.Impossible:
+                index = 0;
+                break;
+        }
+        return (availableMoves[index].Item1, availableMoves[index].Item2);
     }
 
     public void MakeComputerMove()

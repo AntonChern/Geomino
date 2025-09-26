@@ -10,8 +10,10 @@ public class SingleplayerMenu : MonoBehaviour
     [SerializeField] private Button startGameButton;
     [SerializeField] private Button cancelButton;
     [SerializeField] private TMP_InputField playerName;
-    [SerializeField] private TMP_Dropdown computers;
+    //[SerializeField] private TMP_Dropdown computers;
     [SerializeField] private TMP_Dropdown map;
+
+    [SerializeField] private GameObject[] players;
 
     private void Awake()
     {
@@ -22,6 +24,22 @@ public class SingleplayerMenu : MonoBehaviour
     {
         startGameButton.onClick.AddListener(() =>
         {
+            int playersCount = 0;
+            int botsCount = 0;
+            foreach (GameObject player in players)
+            {
+                if (player.activeInHierarchy)
+                {
+                    if (player.GetComponent<BotTile>() != null)
+                    {
+                        //Debug.Log($"difficulty{botsCount} {(int)player.GetComponent<BotTile>().GetDifficulty()}");
+                        PlayerPrefs.SetInt($"difficulty{botsCount++}", (int)player.GetComponent<BotTile>().GetDifficulty());
+                    }
+                    playersCount++;
+                }
+            }
+            PlayerPrefs.SetInt("players", playersCount);
+            PlayerPrefs.Save();
             SceneManager.LoadScene("MultiplayerGame", LoadSceneMode.Single);
         });
         cancelButton.onClick.AddListener(() =>
@@ -34,11 +52,11 @@ public class SingleplayerMenu : MonoBehaviour
             PlayerPrefs.SetString("playerName", value);
             PlayerPrefs.Save();
         });
-        computers.onValueChanged.AddListener((int value) =>
-        {
-            PlayerPrefs.SetInt("players", int.Parse(computers.options[value].text) + 1);
-            PlayerPrefs.Save();
-        });
+        //computers.onValueChanged.AddListener((int value) =>
+        //{
+        //    PlayerPrefs.SetInt("players", int.Parse(computers.options[value].text) + 1);
+        //    PlayerPrefs.Save();
+        //});
         map.onValueChanged.AddListener((int value) =>
         {
             switch (map.options[value].text)
@@ -61,7 +79,8 @@ public class SingleplayerMenu : MonoBehaviour
 
         //Debug.Log(computers.value);
         PlayerPrefs.SetString("map", "infinity");
-        PlayerPrefs.SetInt("players", int.Parse(computers.options[computers.value].text) + 1);
+        //PlayerPrefs.SetInt("players", int.Parse(computers.options[computers.value].text) + 1);
+        PlayerPrefs.SetInt("players", 2);
         PlayerPrefs.Save();
         //Debug.Log(PlayerPrefs.GetString("map"));
 
