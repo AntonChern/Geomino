@@ -1,9 +1,9 @@
-
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -52,14 +52,19 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         //winnerGraph.SetActive(false);
     }
 
-    public override void OnNetworkSpawn()
+    private void UpdateClientIndices()
     {
-        Debug.Log($"On Network Spawn");
         for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
         {
             clientIndex[NetworkManager.Singleton.ConnectedClientsIds[i]] = i;
             //Debug.Log("what " + NetworkManager.Singleton.ConnectedClientsIds[i]);
         }
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        Debug.Log($"On Network Spawn");
+        UpdateClientIndices();
 
         if (IsServer)
         {
@@ -70,8 +75,13 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         }
         NetworkManager.Singleton.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
 
+        NetworkManager.Singleton.OnPreShutdown += OnPreShutdown;
+        //NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
+        //NetworkManager.Singleton.OnClientStopped += OnClientStopped;
+
         currentIdTurn.OnValueChanged += (int oldValue, int newValue) =>
         {
+            //Debug.Log($"turn changed");
             HandleTurn();
             Scoreboard.Instance.UpdateTurn(newValue);
         };
@@ -98,7 +108,180 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
 
     public override void OnDestroy()
     {
-        NetworkManager.Singleton.SceneManager.OnLoadComplete -= SceneManager_OnLoadComplete;
+        if (NetworkManager.Singleton != null)
+        {
+            if (NetworkManager.Singleton.SceneManager != null)
+            {
+                NetworkManager.Singleton.SceneManager.OnLoadComplete -= SceneManager_OnLoadComplete;
+            }
+            NetworkManager.Singleton.OnPreShutdown -= OnPreShutdown;
+        }
+
+        //if (RoomManager.Instance.IsHost())
+        //{
+        //    ShutdownAllRpc();
+        //}
+        //else
+        //{
+        //    AddToBagRpc(GameObject.FindGameObjectsWithTag("DiceUI").Select(dice => dice.GetComponent<DiceUI>().Code).ToArray());
+        //    //ChangeClientIndicesRpc(clientIndex[NetworkManager.Singleton.LocalClientId]);
+        //    ChangeClientIndicesRpc();
+        //}
+    }
+
+    //private void OnClientStopped(bool obj)
+    //{
+    //    Debug.Log("ClientStopped");
+    //}
+
+    //private void OnClientDisconnectCallback(ulong obj)
+    //{
+    //    Debug.Log("ClientDisconnect");
+    //    //if (clientIndex[NetworkManager.Singleton.LocalClientId] == 0) // host disconnected
+    //    //{
+    //    //    ShutdownAllRpc();
+    //    //    return;
+    //    //}
+
+    //    if (NetworkManager.Singleton.LocalClientId != obj) return;
+    //    //ClientDisconnectedRpc(clientIndex[obj]);
+    //    //int index = clientIndex[obj];
+    //    //ClientDisconnectedRpc();
+    //    //foreach (var sos in GameObject.FindGameObjectsWithTag("DiceUI").Select(dice => dice.GetComponent<DiceUI>().Code).ToArray())
+    //    //{
+    //    //    Debug.Log($"Dice {string.Join(" ", sos)}");
+    //    //}
+    //    //AddToBagRpc(index);
+    //    ////AddToBagRpc(GameObject.FindGameObjectsWithTag("DiceUI").Select(dice => dice.GetComponent<DiceUI>().Code).ToArray());
+
+    //}
+
+    //[Rpc(SendTo.Server)]
+    //private void ClientDisconnectedRpc()
+    //{
+    //    Debug.Log($"Here we go");
+    //    //ChangeClientIndicesRpc();
+    //    //ChangeTurnRpc();
+    //    //RemoveScoreRpc(index);
+    //    //UpdateInterfaceRpc(bag.Count, index);
+    //}
+
+    [Rpc(SendTo.Server)]
+    private void ClientPressedExitButtonRpc(ulong id, int[] code1, int[] code2, int[] code3, int[] code4)
+    {
+        Debug.Log("ClientDisconnect");
+        //Debug.Log($"{string.Join(" ", hand)}");
+        //foreach (var sos in hand)
+        //{
+        //Debug.Log($"Dice1 {string.Join(" ", code1)}");
+        //Debug.Log($"Dice2 {string.Join(" ", code2)}");
+        //Debug.Log($"Dice3 {string.Join(" ", code3)}");
+        //Debug.Log($"Dice4 {string.Join(" ", code4)}");
+        //}
+
+        AddToBag(new int[][] { code1, code2, code3, code4 });
+        ////AddToBagRpc(GameObject.FindGameObjectsWithTag("DiceUI").Select(dice => dice.GetComponent<DiceUI>().Code).ToArray());
+        int index = clientIndex[id];
+        ChangeClientIndicesRpc(index);
+        //ChangeTurnRpc();
+        if (currentIdTurn.Value == (NetworkManager.Singleton.ConnectedClientsIds.Count - 1))
+        {
+            currentIdTurn.Value = currentIdTurn.Value % (NetworkManager.Singleton.ConnectedClientsIds.Count - 1);
+        }
+        else
+        {
+            HandleTurnRpc();
+        }
+        RemoveScoreRpc(index);
+        UpdateInterfaceRpc(bag.Count, index);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void HandleTurnRpc()
+    {
+        HandleTurn();
+    }
+
+    [Rpc(SendTo.Server)]
+    private void RemoveScoreRpc(int index)
+    {
+        scores.RemoveAt(index);
+    }
+
+    //[Rpc(SendTo.Server)]
+    //private void ClientDisconnectedRpc(int index)
+    //{
+    //    if (clientIndex[NetworkManager.Singleton.LocalClientId] == index)
+    //    {
+    //        ShutdownAllRpc();
+    //        return;
+    //    }
+    //    AddToBagRpc(GameObject.FindGameObjectsWithTag("DiceUI").Select(dice => dice.GetComponent<DiceUI>().Code).ToArray());
+    //    ChangeClientIndicesRpc();
+    //    //currentIdTurn.Value = currentIdTurn.Value;
+    //    //HandleTurn();
+    //    //Scoreboard.Instance.UpdateTurn(newValue);
+    //    ChangeTurnRpc();
+
+    //    scores.RemoveAt(index);
+    //    UpdateInterfaceRpc(bag.Count, index);
+    //    //ShowNamesRpc();
+    //}
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void UpdateInterfaceRpc(int bagSize, int index)
+    {
+        //Scoreboard.Instance.Null();
+        //Scoreboard.Instance.UpdateScores();
+        Scoreboard.Instance.RemoveByIndex(index);
+        Bag.Instance.UpdateBag(bagSize);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void ShutdownAllRpc()
+    {
+        //NetworkManager.Singleton.Shutdown();
+        RoomManager.Instance.LeaveSession();
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+    }
+
+    //[Rpc(SendTo.Server)]
+    private void AddToBag(int[][] hand)
+    {
+        //Debug.Log("No?");
+        //Debug.Log(hand == null);
+        //Debug.Log(hand.Length);
+        //foreach (var sos in hand)
+        //{
+        //    Debug.Log($"Dice {string.Join(" ", sos)}");
+        //}
+
+        foreach (var code in hand)
+        {
+            if (code == null) continue;
+            bag.Add(code);
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void ChangeClientIndicesRpc(int index)
+    {
+        if (NetworkManager.Singleton.ConnectedClientsIds.Count - 1 == 1)
+        //if (NetworkManager.Singleton.ConnectedClientsIds.Count - 1 == 1 ||
+        //    NetworkManager.Singleton.ConnectedClientsIds.Count == 2 && NetworkManager.Singleton.ConnectedClientsIds.Contains(id))
+        {
+            FinishGame();
+            return;
+        }
+        Dictionary<ulong, int> newClientIndex = new Dictionary<ulong, int>();
+        int i = 0;
+        foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            if (clientIndex[clientId] == index) continue;
+            newClientIndex[clientId] = i++;
+        }
+        clientIndex = newClientIndex;
+        //currentIdTurn.Value = currentIdTurn.Value;
     }
 
     public void EndGame()
@@ -541,16 +724,21 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         SkipMoveRpc();
     }
 
+    private void FinishGame()
+    {
+        EndGameRpc();
+
+        ShowWinnerRpc();
+        GenerateGraphRpc();
+    }
+
     [Rpc(SendTo.Server)]
     public void SkipMoveRpc()
     {
         skippedPlayers++;
         if (NetworkManager.Singleton.ConnectedClientsList.Count == skippedPlayers)
         {
-            EndGameRpc();
-
-            ShowWinnerRpc();
-            GenerateGraphRpc();
+            FinishGame();
             //WinnerGraph
             //OnGameEnded?.Invoke(this, EventArgs.Empty);
             //OnGameEnded?.Invoke(this, new OnGameEndedArgs
@@ -614,9 +802,29 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         throw new System.NotImplementedException();
     }
 
+    private void OnPreShutdown()
+    {
+        //Debug.Log("OnPreShutdown");
+        //Hide();
+        //RoomList.Instance.Show();
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+    }
+
     public void Exit()
     {
-        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        if (!RoomManager.Instance.IsHost())
+        {
+            int[][] hand = GameObject.FindGameObjectsWithTag("DiceUI").Select(dice => dice == null ? null : dice.GetComponent<DiceUI>().Code).ToArray();
+            //Debug.Log($"{string.Join(" ", GameObject.FindGameObjectsWithTag("DiceUI").Select(dice => dice.GetComponent<DiceUI>().Code).ToArray()[0])}");
+            ClientPressedExitButtonRpc(NetworkManager.Singleton.LocalClientId, hand[0], hand[1], hand[2], hand[3]);
+        }
+        //else
+        //{
+        //    //ShutdownAllRpc();
+        //    //return;
+        //}
+        RoomManager.Instance.LeaveSession();
+        //SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
     //public bool RefreshHand()

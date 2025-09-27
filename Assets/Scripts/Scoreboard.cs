@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -29,6 +30,33 @@ public class Scoreboard : MonoBehaviour
     public void SetPlayer(int index, string name)
     {
         names[index].text = name;
+    }
+
+    public void Null()
+    {
+        for (int i = 0; i < names.Length; i++)
+        {
+            names[i].text = string.Empty;
+            scores[i].text = string.Empty;
+        }
+    }
+
+    public void RemoveByIndex(int index)
+    {
+        for (int i = 0; i < names.Length; i++)
+        {
+            if (i >= index && i + 1 < names.Length)
+            {
+                names[i].text = names[i + 1].text;
+
+                scores[i].text = scores[i + 1].text;
+            }
+            else if (i == names.Length - 1)
+            {
+                names[i].text = string.Empty;
+                scores[i].text = string.Empty;
+            }
+        }
     }
 
     public void UpdateScores()
