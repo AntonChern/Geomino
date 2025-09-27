@@ -248,14 +248,26 @@ public class RoomSpace : MonoBehaviour
         //playerIds = newPlayerIds;
 
         //if (RoomManager.Instance.IsHost() && NetworkManager.Singleton.ConnectedClientsIds.Count == session.MaxPlayers)
-        if (RoomManager.Instance.IsHost() && NetworkManager.Singleton.ConnectedClientsIds.Count > 1)
+        if (RoomManager.Instance.IsHost())
         {
-            startGameButton.gameObject.SetActive(true);
+            if (NetworkManager.Singleton.ConnectedClientsIds.Count > 1)
+            {
+                //startGameButton.gameObject.SetActive(true);
+                EnableStartButton();
+            }
+            else
+            {
+                DisableStartButtonHost();
+                // дождитесь хотя бы одного игрока
+            }
         }
         else
         {
-            startGameButton.gameObject.SetActive(false);
+            DisableStartButtonClient();
+            // дождитесь, пока хотс начнёт игру
+            //startGameButton.gameObject.SetActive(false);
         }
+
 
         if (RoomManager.Instance.IsHost())
         {
@@ -281,16 +293,57 @@ public class RoomSpace : MonoBehaviour
 
         //Debug.Log($"{RoomManager.Instance.ActiveSession != null}");
         //NetworkManager.Singleton.isActiveAndEnabled)
-        if (RoomManager.Instance.ActiveSession != null)
-        {
-            leaveGameButton.gameObject.SetActive(true);
-        }
-        else
-        {
-            leaveGameButton.gameObject.SetActive(false);
-        }
+        //if (RoomManager.Instance.ActiveSession != null)
+        //{
+        //    leaveGameButton.gameObject.SetActive(true);
+        //}
+        //else
+        //{
+        //    leaveGameButton.gameObject.SetActive(false);
+        //}
         //Debug.Log($"AvailableSlots = {RoomManager.Instance.ActiveSession.AvailableSlots}");
 
+    }
+
+    private void ColorDisabled(Button button)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            button.transform.GetChild(i).GetComponent<Image>().color = Color.gray;
+        }
+    }
+
+    private void ColorEnabled(Button button)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            button.transform.GetChild(i).GetComponent<Image>().color = Color.white;
+        }
+    }
+
+    private void DisableStartButtonHost()
+    {
+        startGameButton.enabled = false;
+        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Ожидание игроков...";
+        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().fontSize = 37;
+        ColorDisabled(startGameButton);
+    }
+
+    private void DisableStartButtonClient()
+    {
+        startGameButton.enabled = false;
+        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Ожидание, пока хост начнёт игру...";
+        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().fontSize = 37;
+        ColorDisabled(startGameButton);
+    }
+
+    private void EnableStartButton()
+    {
+        //startGameButton.gameObject.SetActive(true);
+        startGameButton.enabled = true;
+        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Начать";
+        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().fontSize = 80;
+        ColorEnabled(startGameButton);
     }
 
     private void ShowNameField()
@@ -324,8 +377,10 @@ public class RoomSpace : MonoBehaviour
 
     public void Hide()
     {
-        startGameButton.gameObject.SetActive(false);
-        leaveGameButton.gameObject.SetActive(false);
+        //startGameButton.gameObject.SetActive(false);
+        startGameButton.enabled = false;
+        ColorDisabled(startGameButton);
+        //leaveGameButton.gameObject.SetActive(false);
         HideNameField();
         mapShowed = false;
         map.gameObject.SetActive(false);

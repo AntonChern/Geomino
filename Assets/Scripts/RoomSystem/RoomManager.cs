@@ -339,42 +339,42 @@ public class RoomManager : MonoBehaviour
 
     public async void LeaveSession()
     {
-        if (ActiveSession != null)
-        {
+        if (ActiveSession == null) return;
+        //{
             //UnregisterSessionEvents();
-            try
+        try
+        {
+            if (IsHost())
             {
-                if (IsHost())
-                {
-                    //Debug.Log("Deleting");
-                    await ActiveSession.AsHost().DeleteAsync();
-                    //ActiveSession.AsHost().Players.First()
-                }
-                else
-                {
-                    await ActiveSession.LeaveAsync();
-                }
-
-                //await ActiveSession.AsHost().RemovePlayerAsync(AuthenticationService.Instance.PlayerId);
-                //NetworkManager.Singleton.Shutdown();
-                //if (IsHost())
-                //{
-                //    ActiveSession;
-                //}
-                //await ActiveSession.SaveCurrentPlayerDataAsync();
-                //ActiveSession.
+                //Debug.Log("Deleting");
+                await ActiveSession.AsHost().DeleteAsync();
+                //ActiveSession.AsHost().Players.First()
             }
-            catch
+            else
             {
-
+                await ActiveSession.LeaveAsync();
             }
-            finally
-            {
-                ActiveSession = null;
-                //Debug.Log($"Leaved");
 
-                //OnUpdateRoom?.Invoke(this, EventArgs.Empty);
-            }
+            //await ActiveSession.AsHost().RemovePlayerAsync(AuthenticationService.Instance.PlayerId);
+            //NetworkManager.Singleton.Shutdown();
+            //if (IsHost())
+            //{
+            //    ActiveSession;
+            //}
+            //await ActiveSession.SaveCurrentPlayerDataAsync();
+            //ActiveSession.
         }
+        catch
+        {
+
+        }
+        finally
+        {
+            ActiveSession = null;
+            //Debug.Log($"Leaved");
+
+            //OnUpdateRoom?.Invoke(this, EventArgs.Empty);
+        }
+        //}
     }
 }
