@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class HexagonMap : MonoBehaviour, IMap
@@ -11,10 +12,13 @@ public class HexagonMap : MonoBehaviour, IMap
 
     private void Awake()
     {
-        if (PlayerPrefs.GetString("map") == "hexagon")
+        if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "hexagon" ||
+            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "hexagon")
         {
-            places.gameObject.SetActive(true);
+            Destroy(gameObject);
+            return;
         }
+        places.gameObject.SetActive(true);
     }
 
     public bool CanBePlaced(Vector2 position)

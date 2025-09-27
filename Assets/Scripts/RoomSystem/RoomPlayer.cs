@@ -7,16 +7,23 @@ public class RoomPlayer : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI playerName;
     [SerializeField] private Button kickButton;
+    //[SerializeField] private TMP_InputField nameField;
 
     private IReadOnlyPlayer player;
 
     private void Awake()
     {
+        if (kickButton == null) return;
         kickButton.onClick.AddListener(() =>
         {
             RoomManager.Instance.KickPlayer(player.Id);
         });
     }
+
+    //public void SetNameFieldVisible(bool visible)
+    //{
+    //    nameField.gameObject.SetActive(visible);
+    //}
 
     public void SetKickPlayerButtonVisible(bool visible)
     {

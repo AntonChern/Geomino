@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Multiplayer;
@@ -12,12 +15,27 @@ public class RoomSpace : MonoBehaviour
     [SerializeField] private Button startGameButton;
     [SerializeField] private Button leaveGameButton;
     //[SerializeField] private TMP_InputField roomName;
-    [SerializeField] private Transform container;
-    [SerializeField] private Transform playerSample;
+    //[SerializeField] private Transform container;
+    //[SerializeField] private Transform playerSample;
+    [SerializeField] private GameObject[] tiles;
+    [SerializeField] private GameObject hostTile;
+    [SerializeField] private TMP_InputField[] nameFields;
+
+    [SerializeField] private TMP_InputField oldNameField;
+
+    [SerializeField] private TMP_Dropdown map;
+    [SerializeField] private GameObject mapName;
+
+    //private List<string> playerIds = new List<string>();
+    //private int[] tilePositions;
+    private bool nameFieldShowed = false;
+    private bool mapShowed = false;
 
     private void Start()
     {
         Instance = this;
+
+        //tilePositions = new int[3] { -1, -1, -1 };
 
         //NetworkManager.Singleton.OnServerStopped += OnRoomUpdated;
         //NetworkManager.Singleton.OnServerStarted += OnRoomUpdated;
@@ -27,9 +45,12 @@ public class RoomSpace : MonoBehaviour
         NetworkManager.Singleton.OnPreShutdown += OnPreShutdown;
         RoomManager.Instance.OnUpdateRoom += OnUpdateRoom;
 
+        //NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
+
         startGameButton.onClick.AddListener(() =>
         {
             //RoomManager.Instance.StartGame();
+            RoomManager.Instance.LockSession();
             NetworkManager.Singleton.SceneManager.LoadScene(RoomManager.Instance.GameScene, LoadSceneMode.Single);
             //RoomManager.Instance.ActiveSession;
         });
@@ -41,6 +62,11 @@ public class RoomSpace : MonoBehaviour
         });
         //leaveGameButton.gameObject.SetActive(false);
 
+        map.onValueChanged.AddListener((int value) =>
+        {
+            RoomManager.Instance.UpdateMap(MapHandler.TranslateToEnglish(map.options[map.value].text));
+        });
+
         UpdatePlayerList();
         Hide();
 
@@ -49,6 +75,53 @@ public class RoomSpace : MonoBehaviour
             Show();
         }
     }
+
+    //private async void OnClientConnectedCallback(ulong obj)
+    //{
+    //    Debug.Log($"OnClientConnectedCallback");
+    //    var session = RoomManager.Instance.ActiveSession;
+
+    //    if (session == null || !RoomManager.Instance.IsHost()) return;
+
+    //    //int index = 0;
+    //    foreach (IPlayer player in RoomManager.Instance.ActiveSession.AsHost().Players)
+    //    {
+    //        //player.Properties
+    //        if (player.Properties[RoomManager.tilePosition].Value == null)
+    //        {
+    //            for (int i = 0; i < tilePositions.Length; i++)
+    //            {
+    //                if (tilePositions[i] == -1)
+    //                {
+    //                    tilePositions[i] = i;
+    //                    //player.Properties[RoomManager.tilePosition] = new SessionProperty(i.ToString(), VisibilityPropertyOptions.Public);
+    //                    player.SetProperty(RoomManager.tilePosition, new PlayerProperty(i.ToString(), VisibilityPropertyOptions.Member));
+    //                    await RoomManager.Instance.ActiveSession.AsHost().SavePlayerDataAsync(player.Id);
+    //                    Debug.Log($"Property changed {i}");
+    //                    //RoomManager.Instance.ActiveSession.AsHost().SavePropertiesAsync();
+    //                    break;
+    //                }
+    //            }
+    //        }
+
+    //        //var playerTile = tiles[int.Parse(player.Properties[RoomManager.tilePosition].Value)];
+    //        //playerTile.SetActive(true);
+
+    //        ////Transform playerTransform = Instantiate(playerSample, container);
+    //        ////playerTransform.gameObject.SetActive(true);
+    //        //RoomPlayer playerUI = playerTile.GetComponent<RoomPlayer>();
+    //        //playerUI.SetKickPlayerButtonVisible(
+    //        //    RoomManager.Instance.IsHost() &&
+    //        //    player.Id != AuthenticationService.Instance.PlayerId
+    //        //);
+    //        //playerUI.UpdatePlayer(player);
+    //    }
+
+    //    foreach (var p in RoomManager.Instance.ActiveSession.Players)
+    //    {
+    //        Debug.Log($"{p.Properties["playerName"].Value} {p.Properties[RoomManager.tilePosition].Value}");
+    //    }
+    //}
 
     public void Leave()
     {
@@ -61,6 +134,8 @@ public class RoomSpace : MonoBehaviour
     {
         NetworkManager.Singleton.OnPreShutdown -= OnPreShutdown;
         RoomManager.Instance.OnUpdateRoom -= OnUpdateRoom;
+
+        //NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnectedCallback;
     }
 
     //private void OnClientDisconnectCallback(ulong obj)
@@ -92,6 +167,7 @@ public class RoomSpace : MonoBehaviour
     {
         //Debug.Log($"Update Player List");
         var session = RoomManager.Instance.ActiveSession;
+        //if (session != null) Debug.Log($"CLIENTS: {session.Players.Count}");
         //var existingSessions = await RoomManager.Instance.QuerySessions();
         //foreach (var existingSession in existingSessions)
         //{
@@ -102,37 +178,105 @@ public class RoomSpace : MonoBehaviour
         //    }
         //}
 
-        foreach (Transform child in container)
+        foreach (GameObject player in tiles)
         {
-            if (child == playerSample) continue;
-
-            Destroy(child.gameObject);
+            player.SetActive(false);
         }
+        //foreach (Transform child in container)
+        //{
+        //    if (child == playerSample) continue;
+
+        //    Destroy(child.gameObject);
+        //}
 
         if (session == null) return;
 
+        if (!nameFieldShowed)
+        {
+            ShowNameField();
+        }
+
+        //playerIds.Clear();
+        List<string> newPlayerIds = new List<string>();
         //Debug.Log($"session.Players.Count = {session.Players.Count}");
         foreach (IReadOnlyPlayer player in session.Players)
         {
+            newPlayerIds.Add(player.Id);
+            //if (player.Id == AuthenticationService.Instance.PlayerId && RoomManager.Instance.ActiveSession.) continue;
             //player.Properties
+            //if (player.Properties[RoomManager.tilePosition].Value == null)
+            //{
+            //    foreach (int position in tilePositions)
+            //    {
+            //        if (position == -1)
+            //        {
+            //            RoomManager.Instance.ActiveSession.AsHost()
+            //            break;
+            //        }
+            //    }
+            //}
+            var tilePosition = player.Properties[RoomManager.tilePosition].Value;
+            //Debug.Log($"tilePosition {tilePosition} " + (tilePosition == null));
+            if (tilePosition == null) continue;
+            if (tilePosition == "host")
+            {
+                hostTile.GetComponent<RoomPlayer>().UpdatePlayer(player);
+                continue;
+            }
 
-            Transform playerTransform = Instantiate(playerSample, container);
-            playerTransform.gameObject.SetActive(true);
-            RoomPlayer playerUI = playerTransform.GetComponent<RoomPlayer>();
+            var playerTile = tiles[int.Parse(tilePosition)];
+            playerTile.SetActive(true);
+
+            //Transform playerTransform = Instantiate(playerSample, container);
+            //playerTransform.gameObject.SetActive(true);
+            RoomPlayer playerUI = playerTile.GetComponent<RoomPlayer>();
+            //playerUI.SetNameFieldVisible(player.Id == AuthenticationService.Instance.PlayerId);
             playerUI.SetKickPlayerButtonVisible(
                 RoomManager.Instance.IsHost() &&
                 player.Id != AuthenticationService.Instance.PlayerId
             );
             playerUI.UpdatePlayer(player);
         }
+        //if (RoomManager.Instance.IsHost())
+        //{
+        //    foreach (string id in playerIds.Except(newPlayerIds))
+        //    {
+        //        Debug.Log($"Removed {id}");
+        //        session.AsHost().RemovePlayerAsync(id);
+        //    }
+        //}
+        //playerIds = newPlayerIds;
 
-        if (RoomManager.Instance.IsHost() && NetworkManager.Singleton.ConnectedClientsIds.Count == session.MaxPlayers)
+        //if (RoomManager.Instance.IsHost() && NetworkManager.Singleton.ConnectedClientsIds.Count == session.MaxPlayers)
+        if (RoomManager.Instance.IsHost() && NetworkManager.Singleton.ConnectedClientsIds.Count > 1)
         {
             startGameButton.gameObject.SetActive(true);
         }
         else
         {
             startGameButton.gameObject.SetActive(false);
+        }
+
+        if (RoomManager.Instance.IsHost())
+        {
+            map.gameObject.SetActive(true);
+            if (!mapShowed)
+            {
+                for (int i = 0; i < map.options.Count; i++)
+                {
+                    if (map.options[i].text == MapHandler.TranslateToRussian(session.Properties[RoomManager.mapProperty].Value))
+                    {
+                        map.value = i;
+                        break;
+                    }
+                }
+                mapShowed = true;
+            }
+        }
+        else
+        {
+            mapName.SetActive(true);
+            mapName.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = MapHandler.TranslateToRussian(session.Properties[RoomManager.mapProperty].Value);
         }
 
         //Debug.Log($"{RoomManager.Instance.ActiveSession != null}");
@@ -149,15 +293,46 @@ public class RoomSpace : MonoBehaviour
 
     }
 
+    private void ShowNameField()
+    {
+        int index = nameFields.Length - 1;
+        string tilePosition = RoomManager.Instance.ActiveSession.CurrentPlayer.Properties[RoomManager.tilePosition].Value;
+        if (tilePosition != "host")
+        {
+            index = int.Parse(tilePosition);
+        }
+        nameFields[index].gameObject.SetActive(true);
+        nameFieldShowed = true;
+    }
+
+    private void HideNameField()
+    {
+        foreach (var nameField in nameFields)
+        {
+            nameField.gameObject.SetActive(false);
+        }
+        nameFieldShowed = false;
+    }
+
     public void Show()
     {
         gameObject.SetActive(true);
+
+        oldNameField.gameObject.SetActive(false);
+        //ShowNameField();
     }
 
     public void Hide()
     {
         startGameButton.gameObject.SetActive(false);
         leaveGameButton.gameObject.SetActive(false);
+        HideNameField();
+        mapShowed = false;
+        map.gameObject.SetActive(false);
+        mapName.SetActive(false);
+        oldNameField.text = RoomManager.Instance.PlayerName;
+        oldNameField.gameObject.SetActive(true);
+
         gameObject.SetActive(false);
     }
 }

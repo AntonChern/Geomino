@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,10 +9,14 @@ public class InfinityMap : MonoBehaviour, IMap
 
     private void Awake()
     {
-        if (PlayerPrefs.GetString("map") == "infinity")
+
+        if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "infinity" ||
+            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "infinity")
         {
-            places.SetActive(true);
+            Destroy(gameObject);
+            return;
         }
+        places.SetActive(true);
         backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
     }
 

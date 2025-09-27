@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
@@ -10,10 +11,13 @@ public class ColumnsMap : MonoBehaviour, IMap
 
     private void Awake()
     {
-        if (PlayerPrefs.GetString("map") == "columns")
+        if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "columns" ||
+            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "columns")
         {
-            places.gameObject.SetActive(true);
+            Destroy(gameObject);
+            return;
         }
+        places.gameObject.SetActive(true);
 
         backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
         cameraOffset = places.transform.position.y - Camera.main.transform.position.y; // =13/18

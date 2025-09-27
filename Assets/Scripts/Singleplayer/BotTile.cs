@@ -23,12 +23,30 @@ public class BotTile : MonoBehaviour
         {
             difficulty = difficulty.Next();
             difficultyButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = DifficultyHandler.Translate(difficulty);
+            difficultyButton.GetComponent<Image>().color = GetColor(difficulty);
         });
         if (removeButton == null) return;
         removeButton.onClick.AddListener(() =>
         {
             gameObject.SetActive(false);
         });
+    }
+
+    private Color GetColor(Difficulty difficulty)
+    {
+        switch (difficulty)
+        {
+            case Difficulty.Easy:
+                return new Color(0f, 0.75f, 0f, 1f);
+            case Difficulty.Medium:
+                return Color.blue;
+            case Difficulty.Hard:
+                return new Color(0.75f, 0f, 0.75f, 1f);
+            case Difficulty.Impossible:
+                return new Color(1f, 0.5f, 0f, 1f);
+            default:
+                return Color.white;
+        }
     }
 }
 
@@ -39,7 +57,6 @@ public enum Difficulty
     Hard = 2,
     Impossible = 3
 }
-
 
 public static class DifficultyHandler
 {

@@ -59,21 +59,22 @@ public class SingleplayerMenu : MonoBehaviour
         //});
         map.onValueChanged.AddListener((int value) =>
         {
-            switch (map.options[value].text)
-            {
-                case "Бесконечная":
-                    PlayerPrefs.SetString("map", "infinity");
-                    break;
-                case "Коридор":
-                    PlayerPrefs.SetString("map", "hallway");
-                    break;
-                case "Гексагон":
-                    PlayerPrefs.SetString("map", "hexagon");
-                    break;
-                case "Колонны":
-                    PlayerPrefs.SetString("map", "columns");
-                    break;
-            }
+            //switch (map.options[value].text)
+            //{
+            //    case "Бесконечная":
+            //        PlayerPrefs.SetString("map", "infinity");
+            //        break;
+            //    case "Коридор":
+            //        PlayerPrefs.SetString("map", "hallway");
+            //        break;
+            //    case "Гексагон":
+            //        PlayerPrefs.SetString("map", "hexagon");
+            //        break;
+            //    case "Колонны":
+            //        PlayerPrefs.SetString("map", "columns");
+            //        break;
+            //}
+            PlayerPrefs.SetString("map", MapHandler.TranslateToEnglish(map.options[value].text));
             PlayerPrefs.Save();
         });
 

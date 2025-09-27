@@ -1,11 +1,12 @@
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static UnityEngine.Rendering.DebugUI;
 
 public class MultiplayerManager : NetworkBehaviour, IGameManager
 {
@@ -23,6 +24,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     private List<int[]> history = new List<int[]>();
 
     [SerializeField] private Transform tilePrefab;
+    //[SerializeField] private TextMeshProUGUI exitButtonText;
     //[SerializeField] private GameObject winnerGraph;
 
     private void Awake()
@@ -93,6 +95,34 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     }
 
     public void EndGame()
+    {
+        StartQuitCountDownRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void StartQuitCountDownRpc()
+    {
+        WinnerGraph.Instance.DisableExitButton();
+
+        IEnumerator quitWaiter()
+        {
+            for (int i = 5; i > 0; i--)
+            {
+                WinnerGraph.Instance.SetExitButtonText($"Возвращение в комнату через {i}");
+                yield return new WaitForSeconds(1);
+            }
+            if (NetworkManager.Singleton.IsHost)
+            {
+                QuitGame();
+                RoomManager.Instance.UnlockSession();
+            }
+        }
+
+        StartCoroutine(quitWaiter());
+    }
+
+    //[Rpc(SendTo.Server)]
+    private void QuitGame()
     {
         NetworkManager.Singleton.SceneManager.LoadScene("RoomSystem", LoadSceneMode.Single);
     }
@@ -279,6 +309,12 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         UpdateScoresRpc(NetworkManager.Singleton.LocalClientId, value);
 
         if (value == 0) return;
+        SpawnScoreRpc(position, value);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SpawnScoreRpc(Vector2 position, int value)
+    {
         WorldCanvas.Instance.SpawnScore(position, value);
     }
 
@@ -352,7 +388,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     private void GenerateBag()
     {
         int colors = 7;
-        //int maxNumber = 2;
+        int maxNumber = 8;
         bag = new List<int[]>();
         for (int i = 0; i < colors; i++)
         {
@@ -362,10 +398,10 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
                 {
                     bag.Add(new int[3] { i, j, k });
                     bag.Add(new int[3] { i, k, j });
-                    //if (bag.Count >= maxNumber)
-                    //{
-                    //    return;
-                    //}
+                    if (bag.Count >= maxNumber)
+                    {
+                        return;
+                    }
                 }
             }
         }

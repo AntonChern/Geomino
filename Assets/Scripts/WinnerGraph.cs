@@ -53,6 +53,16 @@ public class WinnerGraph : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    public void DisableExitButton()
+    {
+        exitButton.enabled = false;
+    }
+
+    public void SetExitButtonText(string value)
+    {
+        exitButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = value;
+    }
+
     private void SlideGraph()
     {
         isSliding = true;

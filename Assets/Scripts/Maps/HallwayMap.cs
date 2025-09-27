@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class HallwayMap : MonoBehaviour, IMap
@@ -9,10 +10,13 @@ public class HallwayMap : MonoBehaviour, IMap
 
     private void Awake()
     {
-        if (PlayerPrefs.GetString("map") == "hallway")
+        if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "hallway" ||
+            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "hallway")
         {
-            places.gameObject.SetActive(true);
+            Destroy(gameObject);
+            return;
         }
+        places.gameObject.SetActive(true);
         backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
     }
 

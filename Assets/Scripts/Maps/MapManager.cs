@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public class MapManager : MonoBehaviour
 {
@@ -53,5 +54,50 @@ public class MapManager : MonoBehaviour
         background.GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
         
         map.DragMap(offset);
+    }
+}
+
+public static class MapHandler
+{
+    public static string TranslateToEnglish(string map)
+    {
+        string result = string.Empty;
+        switch (map)
+        {
+            case "Бесконечная":
+                result = "infinity";
+                break;
+            case "Коридор":
+                result = "hallway";
+                break;
+            case "Гексагон":
+                result = "hexagon";
+                break;
+            case "Колонны":
+                result = "columns";
+                break;
+        }
+        return result;
+    }
+
+    public static string TranslateToRussian(string map)
+    {
+        string result = string.Empty;
+        switch (map)
+        {
+            case "infinity":
+                result = "Бесконечная";
+                break;
+            case "hallway":
+                result = "Коридор";
+                break;
+            case "hexagon":
+                result = "Гексагон";
+                break;
+            case "columns":
+                result = "Колонны";
+                break;
+        }
+        return result;
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Services.Authentication;
@@ -41,7 +42,9 @@ public class RoomManager : MonoBehaviour
 
     string sessionName = "MyRoom";
 
-    const string playerNamePropertyKey = "playerName";
+    public const string playerNamePropertyKey = "playerName";
+    public const string mapProperty = "map";
+    public const string tilePosition = "tilePosition";
 
     private void Awake()
     {
@@ -100,6 +103,10 @@ public class RoomManager : MonoBehaviour
     {
         //UnityServices.
         //Debug.Log($"Sign Out");
+        if (IsHost())
+        {
+            ActiveSession.AsHost().DeleteAsync();
+        }
         AuthenticationService.Instance.SignOut();
     }
 
@@ -112,6 +119,13 @@ public class RoomManager : MonoBehaviour
             sessionPollTimer = 0f;
             OnUpdateRoom?.Invoke(this, EventArgs.Empty);
         }
+    }
+
+    public void UpdateMap(string value)
+    {
+        SessionProperty sessionProperty = new SessionProperty(value, VisibilityPropertyOptions.Member);
+        ActiveSession.AsHost().SetProperty(mapProperty, sessionProperty);
+        ActiveSession.AsHost().SavePropertiesAsync();
     }
 
     public void UpdatePlayerName(string newName)
@@ -129,6 +143,19 @@ public class RoomManager : MonoBehaviour
         //    player.Properties[playerNamePropertyKey] = playerName;
         //}
     }
+
+    //private void SetPlayerTileUI(string value)
+    //{
+    //    if (ActiveSession == null) return;
+    //    var tilePositionProperty = new PlayerProperty(value, VisibilityPropertyOptions.Member);
+    //    ActiveSession.CurrentPlayer.SetProperty(tilePosition, tilePositionProperty);
+    //    ActiveSession.SaveCurrentPlayerDataAsync();
+    //    //ActiveSession.AsHost().SetProperties()
+    //    //foreach (var player in ActiveSession.Players)
+    //    //{
+    //    //    player.Properties[playerNamePropertyKey] = playerName;
+    //    //}
+    //}
 
     //public void StartGame()
     //{
@@ -169,6 +196,7 @@ public class RoomManager : MonoBehaviour
         ActiveSession = await MultiplayerService.Instance.CreateOrJoinSessionAsync(sessionName, options);
         Debug.Log($"Session {ActiveSession.Id} created! Join code: {ActiveSession.Code}");
 
+        //ActiveSession.AsHost().SetProperty(mapProperty, new SessionProperty("infinity"));
         //OnUpdateRoom?.Invoke(this, EventArgs.Empty);
     }
 
@@ -192,11 +220,16 @@ public class RoomManager : MonoBehaviour
 
     //}
 
-    Dictionary<string, PlayerProperty> GetPlayerProperties()
+    Dictionary<string, PlayerProperty> GetPlayerProperties(string value)
     {
         //var playerName = await AuthenticationService.Instance.GetPlayerNameAsync();
         var playerNameProperty = new PlayerProperty(playerName, VisibilityPropertyOptions.Member);
-        return new Dictionary<string, PlayerProperty> { { playerNamePropertyKey, playerNameProperty } };
+        var tilePositionProperty = new PlayerProperty(value, VisibilityPropertyOptions.Member);
+        return new Dictionary<string, PlayerProperty>
+        {
+            { playerNamePropertyKey, playerNameProperty },
+            { tilePosition, tilePositionProperty }
+        };
     }
 
     //async Task<Dictionary<string, PlayerProperty>> GetPlayerProperties()
@@ -206,29 +239,63 @@ public class RoomManager : MonoBehaviour
     //    return new Dictionary<string, PlayerProperty> { { playerNamePropertyKey, playerNameProperty } };
     //}
 
-    public async void CreateSessionAsHost(string name, int players, bool isPrivate)
+    public void LockSession()
     {
-        var playerProperties = GetPlayerProperties();
+        ActiveSession.AsHost().IsLocked = true;
+        ActiveSession.AsHost().SavePropertiesAsync();
+    }
+
+    public void UnlockSession()
+    {
+        ActiveSession.AsHost().IsLocked = false;
+        ActiveSession.AsHost().SavePropertiesAsync();
+    }
+
+    public async void CreateSessionAsHost(string name, int maxPlayers, bool isPrivate, string map)
+    {
+        var playerProperties = GetPlayerProperties("host");
+        var sessionMapProperty = new SessionProperty(map, VisibilityPropertyOptions.Member);
 
         var options = new SessionOptions
         {
             Name = name,
-            MaxPlayers = players,
+            //MaxPlayers = players,
+            MaxPlayers = maxPlayers,
             IsLocked = false,
             IsPrivate = isPrivate,
-            PlayerProperties = playerProperties
+            PlayerProperties = playerProperties,
+            SessionProperties = new Dictionary<string, SessionProperty>
+            {
+                { mapProperty, sessionMapProperty }
+            },
         }.WithRelayNetwork();
 
         ActiveSession = await MultiplayerService.Instance.CreateSessionAsync(options);
         Debug.Log($"Session {ActiveSession.Id} created! Join code: {ActiveSession.Code}");
 
+        //SetPlayerTileUI("host");
         //networkManager.SceneManager.OnLoad += SceneManager_OnLoad;
         //OnUpdateRoom?.Invoke(this, EventArgs.Empty);
     }
 
+    private void SetPlayerTile()
+    {
+        List<int> availablePositions = new List<int>() { 0, 1, 2 };
+        foreach (IReadOnlyPlayer player in ActiveSession.Players)
+        {
+            if (player.Properties[tilePosition].Value == "host" || player.Properties[tilePosition].Value == null) continue;
+
+            availablePositions.Remove(int.Parse(player.Properties[tilePosition].Value));
+        }
+
+        var tilePositionProperty = new PlayerProperty(availablePositions.Min().ToString(), VisibilityPropertyOptions.Member);
+        ActiveSession.CurrentPlayer.SetProperty(tilePosition, tilePositionProperty);
+        ActiveSession.SaveCurrentPlayerDataAsync();
+    }
+
     public async void JoinSessionById(string sessionId)
     {
-        var playerProperties = GetPlayerProperties();
+        var playerProperties = GetPlayerProperties(null);
 
         var options = new JoinSessionOptions
         {
@@ -238,6 +305,10 @@ public class RoomManager : MonoBehaviour
         ActiveSession = await MultiplayerService.Instance.JoinSessionByIdAsync(sessionId, options);
         Debug.Log($"Session {ActiveSession.Id} joined!");
 
+        //ActiveSession.AsHost().re
+
+        SetPlayerTile();
+        //SetPlayerTileUI(null);
         //networkManager.SceneManager.OnLoad += SceneManager_OnLoad;
         //OnUpdateRoom?.Invoke(this, EventArgs.Empty);
     }
@@ -277,6 +348,7 @@ public class RoomManager : MonoBehaviour
                 {
                     //Debug.Log("Deleting");
                     await ActiveSession.AsHost().DeleteAsync();
+                    //ActiveSession.AsHost().Players.First()
                 }
                 else
                 {
@@ -299,6 +371,7 @@ public class RoomManager : MonoBehaviour
             finally
             {
                 ActiveSession = null;
+                //Debug.Log($"Leaved");
 
                 //OnUpdateRoom?.Invoke(this, EventArgs.Empty);
             }
