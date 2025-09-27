@@ -810,13 +810,19 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
+    private void OnApplicationQuit()
+    {
+        Debug.Log("Quit");
+        Exit();
+    }
+
     public void Exit()
     {
         if (!RoomManager.Instance.IsHost())
         {
             int[][] hand = GameObject.FindGameObjectsWithTag("DiceUI").Select(dice => dice == null ? null : dice.GetComponent<DiceUI>().Code).ToArray();
             //Debug.Log($"{string.Join(" ", GameObject.FindGameObjectsWithTag("DiceUI").Select(dice => dice.GetComponent<DiceUI>().Code).ToArray()[0])}");
-            ClientPressedExitButtonRpc(NetworkManager.Singleton.LocalClientId, hand[0], hand[1], hand[2], hand[3]);
+            ClientPressedExitButtonRpc(NetworkManager.Singleton.LocalClientId, hand.Length <= 0 ? null : hand[0], hand.Length <= 1 ? null : hand[1], hand.Length <= 2 ? null : hand[2], hand.Length <= 3 ? null : hand[3]);
         }
         //else
         //{
