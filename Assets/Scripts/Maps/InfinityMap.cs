@@ -4,7 +4,9 @@ using UnityEngine.UIElements;
 
 public class InfinityMap : MonoBehaviour, IMap
 {
-    [SerializeField] private GameObject places;
+    [SerializeField] private GameObject placesPrefab;
+
+    private GameObject places;
     private Vector2 backgroundOffset;
 
     private void Awake()
@@ -13,10 +15,12 @@ public class InfinityMap : MonoBehaviour, IMap
         if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "infinity" ||
             NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "infinity")
         {
+            gameObject.SetActive(false);
             Destroy(gameObject);
             return;
         }
-        places.SetActive(true);
+        //places.SetActive(true);
+        places = Instantiate(placesPrefab, gameObject.transform);
         backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
     }
 

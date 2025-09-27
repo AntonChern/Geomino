@@ -3,7 +3,9 @@ using UnityEngine;
 
 public class HallwayMap : MonoBehaviour, IMap
 {
-    [SerializeField] private GameObject places;
+    [SerializeField] private GameObject placesPrefab;
+    private GameObject places;
+
     private Vector2 backgroundOffset;
 
     private float radius = 2.5f * Mathf.Sqrt(3) / 2;
@@ -13,10 +15,13 @@ public class HallwayMap : MonoBehaviour, IMap
         if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "hallway" ||
             NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "hallway")
         {
+            gameObject.SetActive(false);
             Destroy(gameObject);
             return;
         }
-        places.gameObject.SetActive(true);
+        //places.gameObject.SetActive(true);
+        places = Instantiate(placesPrefab, gameObject.transform);
+
         backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
     }
 

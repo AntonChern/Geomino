@@ -5,7 +5,9 @@ using UnityEngine.UIElements;
 
 public class ColumnsMap : MonoBehaviour, IMap
 {
-    [SerializeField] private GameObject places;
+    [SerializeField] private GameObject placesPrefab;
+    private GameObject places;
+
     private Vector2 backgroundOffset;
     private float cameraOffset;
 
@@ -14,10 +16,12 @@ public class ColumnsMap : MonoBehaviour, IMap
         if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "columns" ||
             NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "columns")
         {
+            gameObject.SetActive(false);
             Destroy(gameObject);
             return;
         }
-        places.gameObject.SetActive(true);
+        //places.gameObject.SetActive(true);
+        places = Instantiate(placesPrefab, gameObject.transform);
 
         backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
         cameraOffset = places.transform.position.y - Camera.main.transform.position.y; // =13/18

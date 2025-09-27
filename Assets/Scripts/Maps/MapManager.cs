@@ -32,9 +32,11 @@ public class MapManager : MonoBehaviour
     {
         backgroundOffset = background.GetComponent<Renderer>().material.mainTextureOffset;
 
+        //Debug.Log("children " + transform.childCount);
+        //map = transform.GetChild(0).GetComponent<IMap>();
         for (int i = 0; i < transform.childCount; i++)
         {
-            if (transform.GetChild(i).GetChild(0).gameObject.activeInHierarchy)
+            if (transform.GetChild(i).gameObject.activeInHierarchy)
             {
                 map = transform.GetChild(i).GetComponent<IMap>();
                 break;

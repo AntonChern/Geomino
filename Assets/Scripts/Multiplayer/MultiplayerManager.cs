@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -24,6 +23,8 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     private List<int[]> history = new List<int[]>();
 
     [SerializeField] private Transform tilePrefab;
+
+    private Dictionary<ulong, int> clientIndex = new Dictionary<ulong, int>();
     //[SerializeField] private TextMeshProUGUI exitButtonText;
     //[SerializeField] private GameObject winnerGraph;
 
@@ -54,11 +55,17 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     public override void OnNetworkSpawn()
     {
         Debug.Log($"On Network Spawn");
+        for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
+        {
+            clientIndex[NetworkManager.Singleton.ConnectedClientsIds[i]] = i;
+            //Debug.Log("what " + NetworkManager.Singleton.ConnectedClientsIds[i]);
+        }
+
         if (IsServer)
         {
             foreach (ulong index in NetworkManager.Singleton.ConnectedClientsIds)
             {
-                sceneLoaded[(int)index] = false;
+                sceneLoaded[clientIndex[index]] = false;
             }
         }
         NetworkManager.Singleton.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
@@ -78,13 +85,13 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     {
         foreach (var index in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            if (winners.Contains((int)index))
+            if (winners.Contains(clientIndex[index]))
             {
-                Scoreboard.Instance.HighlightPlayer((int)index);
+                Scoreboard.Instance.HighlightPlayer(clientIndex[index]);
             }
             else
             {
-                Scoreboard.Instance.LowlightPlayer((int)index);
+                Scoreboard.Instance.LowlightPlayer(clientIndex[index]);
             }
         }
     }
@@ -167,9 +174,9 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     }
 
     [Rpc(SendTo.Server)]
-    private void SceneLoadedRpc(ulong clientId)
+    private void SceneLoadedRpc(int clientId)
     {
-        sceneLoaded[(int)clientId] = true;
+        sceneLoaded[clientId] = true;
         Debug.Log($"Client {clientId} is ready");
         if (sceneLoaded.Values.All(value => value))
         {
@@ -192,13 +199,19 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         //Debug.Log($"Start Game");
 
         GenerateBag();
+        //Debug.Log("1");
         InitiateScores();
+        //Debug.Log("2");
         //OnGameStarted?.Invoke(this, EventArgs.Empty);
         SpawnInitialObjectRpc();
+        //Debug.Log("3");
         GenerateHandsRpc(); // ???
+        //Debug.Log("4");
         ShowNamesRpc();
+        //Debug.Log("5");
 
         HandleTurn();
+        //Debug.Log("6");
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -206,12 +219,12 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     {
         foreach (GameObject diceUI in GameObject.FindGameObjectsWithTag("DiceUI"))
         {
-            GetDiceRpc(NetworkManager.Singleton.LocalClientId);
+            GetDiceRpc(clientIndex[NetworkManager.Singleton.LocalClientId]);
         }
     }
 
     [Rpc(SendTo.Server)]
-    public void GetDiceRpc(ulong clientId, int index)
+    public void GetDiceRpc(int clientId, int index)
     {
         if (bag.Count == 0)
         {
@@ -231,7 +244,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     }
 
     [Rpc(SendTo.Server)]
-    public void GetDiceRpc(ulong clientId)
+    public void GetDiceRpc(int clientId)
     {
         //return GetDiceRpc(UnityEngine.Random.Range(0, bag.Count - 1));
         //int[] result = GetDiceRpc(clientId, UnityEngine.Random.Range(0, bag.Count - 1));
@@ -245,9 +258,9 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ReturnDiceRpc(ulong clientId, int[] result)
+    private void ReturnDiceRpc(int clientId, int[] result)
     {
-        if (NetworkManager.Singleton.LocalClientId == clientId)
+        if (clientIndex[NetworkManager.Singleton.LocalClientId] == clientId)
         {
             //if (result != null)
             //    Debug.Log("Recieved " + result[0] + ", " + result[1] + ", " + result[2]);
@@ -306,7 +319,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
                 value += code[i];
             }
         }
-        UpdateScoresRpc(NetworkManager.Singleton.LocalClientId, value);
+        UpdateScoresRpc(clientIndex[NetworkManager.Singleton.LocalClientId], value);
 
         if (value == 0) return;
         SpawnScoreRpc(position, value);
@@ -334,7 +347,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     //}
 
     [Rpc(SendTo.Server)]
-    public void UpdateScoresRpc(ulong clientId, int value)
+    public void UpdateScoresRpc(int clientId, int value)
     {
         scores[(int)clientId] += value;
     }
@@ -388,7 +401,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     private void GenerateBag()
     {
         int colors = 7;
-        int maxNumber = 8;
+        //int maxNumber = 8;
         bag = new List<int[]>();
         for (int i = 0; i < colors; i++)
         {
@@ -398,13 +411,14 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
                 {
                     bag.Add(new int[3] { i, j, k });
                     bag.Add(new int[3] { i, k, j });
-                    if (bag.Count >= maxNumber)
-                    {
-                        return;
-                    }
+                    //if (bag.Count >= maxNumber)
+                    //{
+                    //    return;
+                    //}
                 }
             }
         }
+        //Debug.Log("Bag generated");
     }
 
     private void InitiateScores()
@@ -413,17 +427,18 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         {
             scores.Add(0);
         }
+        //Debug.Log("Scores initiated");
     }
 
     private void SceneManager_OnLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
     {
         if (sceneName == RoomManager.Instance.GameScene)
-            SceneLoadedRpc(NetworkManager.Singleton.LocalClientId);
+            SceneLoadedRpc(clientIndex[NetworkManager.Singleton.LocalClientId]);
     }
 
     private void HandleTurn()
     {
-        if (currentIdTurn.Value == (int)NetworkManager.Singleton.LocalClientId)
+        if (currentIdTurn.Value == clientIndex[NetworkManager.Singleton.LocalClientId])
         {
             //VisualManager.Instance.ShowPlaces();
             VisualManager.Instance.RefreshHand();
@@ -435,7 +450,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
 
     public void HandleButton(int index, int[] code)
     {
-        HandleButtonRpc(NetworkManager.Singleton.LocalClientId, index, code);
+        HandleButtonRpc(clientIndex[NetworkManager.Singleton.LocalClientId], index, code);
     }
 
     private bool Suits(int[] code, int[] diceCode)
@@ -461,7 +476,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     }
 
     [Rpc(SendTo.Server)]
-    public void HandleButtonRpc(ulong clientId, int index, int[] code)
+    public void HandleButtonRpc(int clientId, int index, int[] code)
     {
         Transform board = GameObject.FindGameObjectWithTag("Board").transform;
         bool playableDice = false;
@@ -498,9 +513,9 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ReturnHandledButtonRpc(ulong clientId, int index, bool playableDice)
+    private void ReturnHandledButtonRpc(int clientId, int index, bool playableDice)
     {
-        if (NetworkManager.Singleton.LocalClientId == clientId)
+        if (clientIndex[NetworkManager.Singleton.LocalClientId] == clientId)
         {
             VisualManager.Instance.ReturnHandledButton(index, playableDice);
         }
@@ -578,7 +593,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         //SubscribeTilesAround(e.position, e.state, e.code);
 
         //ChangeButtonColor(pressed, Color.white);
-        GetDiceRpc(NetworkManager.Singleton.LocalClientId);
+        GetDiceRpc(clientIndex[NetworkManager.Singleton.LocalClientId]);
         //CheckMovesRpc();
         //VisualManager.Instance.DisableButtons();
         //Debug.Log("currentIdTurn.Value = " + currentIdTurn.Value);
