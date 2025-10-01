@@ -73,7 +73,8 @@ public class DiceUI : MonoBehaviour
 
     public void Disable()
     {
-        ChangeColor(gameObject, Color.gray);
+        //ChangeColor(gameObject, Color.gray);
+        ChangeColor(gameObject, new Color(0.375f, 0.375f, 0.375f, 1f));
         gameObject.GetComponent<Button>().enabled = false;
     }
 

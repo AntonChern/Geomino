@@ -32,24 +32,49 @@ public class CreateRoom : MonoBehaviour
         {
             Cancel();
         });
+        roomName.onValueChanged.AddListener((string value) =>
+        {
+            if (value == string.Empty)
+            {
+                createRoomButton.enabled = false;
+                createRoomButton.GetComponent<Image>().color = Color.gray;
+                foreach (Transform child in createRoomButton.transform)
+                {
+                    if (child.GetComponent<TextMeshProUGUI>() == null) continue;
+                    child.GetComponent<TextMeshProUGUI>().text = "Название комнаты не может быть пустым!";
+                    break;
+                }
+            }
+            else
+            {
+                createRoomButton.enabled = true;
+                createRoomButton.GetComponent<Image>().color = Color.white;
+                foreach (Transform child in createRoomButton.transform)
+                {
+                    if (child.GetComponent<TextMeshProUGUI>() == null) continue;
+                    child.GetComponent<TextMeshProUGUI>().text = "Создать";
+                    break;
+                }
+            }
+        });
         //map.onValueChanged.AddListener((int value) =>
         //{
-            //switch (map.options[value].text)
-            //{
-            //    case "Бесконечная":
-            //        PlayerPrefs.SetString("map", "infinity");
-            //        break;
-            //    case "Коридор":
-            //        PlayerPrefs.SetString("map", "hallway");
-            //        break;
-            //    case "Гексагон":
-            //        PlayerPrefs.SetString("map", "hexagon");
-            //        break;
-            //    case "Колонны":
-            //        PlayerPrefs.SetString("map", "columns");
-            //        break;
-            //}
-            //PlayerPrefs.Save();
+        //switch (map.options[value].text)
+        //{
+        //    case "Бесконечная":
+        //        PlayerPrefs.SetString("map", "infinity");
+        //        break;
+        //    case "Коридор":
+        //        PlayerPrefs.SetString("map", "hallway");
+        //        break;
+        //    case "Гексагон":
+        //        PlayerPrefs.SetString("map", "hexagon");
+        //        break;
+        //    case "Колонны":
+        //        PlayerPrefs.SetString("map", "columns");
+        //        break;
+        //}
+        //PlayerPrefs.Save();
         //});
         //PlayerPrefs.SetString("map", "infinity");
         //PlayerPrefs.Save();

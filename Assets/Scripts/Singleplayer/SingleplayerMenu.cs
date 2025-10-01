@@ -39,6 +39,7 @@ public class SingleplayerMenu : MonoBehaviour
                 }
             }
             PlayerPrefs.SetInt("players", playersCount);
+            PlayerPrefs.SetString("playerName", playerName.text);
             PlayerPrefs.Save();
             SceneManager.LoadScene("MultiplayerGame", LoadSceneMode.Single);
         });
@@ -91,7 +92,8 @@ public class SingleplayerMenu : MonoBehaviour
     public void Show()
     {
         gameObject.SetActive(true);
-        playerName.text = PlayerPrefs.GetString("playerName");
+        if (PlayerPrefs.GetString("playerName") != string.Empty) 
+            playerName.text = PlayerPrefs.GetString("playerName");
     }
 
     public void Hide()

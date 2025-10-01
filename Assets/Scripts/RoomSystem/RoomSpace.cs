@@ -344,16 +344,28 @@ public class RoomSpace : MonoBehaviour
     private void DisableStartButtonHost()
     {
         startGameButton.enabled = false;
-        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Ожидание игроков...";
-        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().fontSize = 37;
+        foreach (Transform child in startGameButton.transform)
+        {
+            if (child.GetComponent<TextMeshProUGUI>() == null) continue;
+            child.GetComponent<TextMeshProUGUI>().text = "Ожидание игроков...";
+            break;
+        }
+        //startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Ожидание игроков...";
+        //startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().fontSize = 37;
         ColorDisabled(startGameButton);
     }
 
     private void DisableStartButtonClient()
     {
         startGameButton.enabled = false;
-        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Ожидание, пока хост начнёт игру...";
-        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().fontSize = 37;
+        foreach (Transform child in startGameButton.transform)
+        {
+            if (child.GetComponent<TextMeshProUGUI>() == null) continue;
+            child.GetComponent<TextMeshProUGUI>().text = "Ожидание, пока хост начнёт игру...";
+            break;
+        }
+        //startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Ожидание, пока хост начнёт игру...";
+        //startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().fontSize = 37;
         ColorDisabled(startGameButton);
     }
 
@@ -361,8 +373,14 @@ public class RoomSpace : MonoBehaviour
     {
         //startGameButton.gameObject.SetActive(true);
         startGameButton.enabled = true;
-        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Начать";
-        startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().fontSize = 80;
+        foreach (Transform child in startGameButton.transform)
+        {
+            if (child.GetComponent<TextMeshProUGUI>() == null) continue;
+            child.GetComponent<TextMeshProUGUI>().text = "Начать";
+            break;
+        }
+        //startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Начать";
+        //startGameButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().fontSize = 80;
         ColorEnabled(startGameButton);
     }
 
