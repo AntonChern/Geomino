@@ -12,6 +12,8 @@ public class DiceUI : MonoBehaviour
 
     [SerializeField] private int index;
 
+    [SerializeField] private GameObject aura;
+
     public int Index
     {
         get => index;
@@ -28,15 +30,18 @@ public class DiceUI : MonoBehaviour
     {
         gameObject.GetComponent<Button>().onClick.AddListener(() =>
         {
-            if (GetComponent<Image>().color == Color.green)
+            //if (GetComponent<Image>().color == Color.green)
+            if (aura.activeInHierarchy)
             {
-                ChangeColor(gameObject, Color.white);
+                HideAura();
+                //ChangeColor(gameObject, Color.white);
                 VisualManager.Instance.Unchoose();
             }
             else
             {
-                NullColors();
-                ChangeColor(gameObject, Color.green);
+                NullAuras();
+                //ChangeColor(gameObject, Color.green);
+                ShowAura();
                 //ChangeColor(gameObject, Color.yellow);
                 VisualManager.Instance.Choose(index, code);
             }
@@ -78,13 +83,24 @@ public class DiceUI : MonoBehaviour
         gameObject.GetComponent<Button>().enabled = true;
     }
 
-    private void NullColors()
+    private void NullAuras()
     {
         foreach (GameObject diceUI in GameObject.FindGameObjectsWithTag("DiceUI"))
         {
             if (!diceUI.GetComponent<Button>().enabled) continue;
-            ChangeColor(diceUI, Color.white);
+            //ChangeColor(diceUI, Color.white);
+            diceUI.GetComponent<DiceUI>().HideAura();
         }
+    }
+
+    public void ShowAura()
+    {
+        aura.SetActive(true);
+    }
+
+    public void HideAura()
+    {
+        aura.SetActive(false);
     }
 
     private void ChangeColor(GameObject obj, Color color)

@@ -56,6 +56,7 @@ public class WinnerGraph : MonoBehaviour
     public void DisableExitButton()
     {
         exitButton.enabled = false;
+        exitButton.GetComponent<Image>().color = Color.gray;
     }
 
     public void SetExitButtonText(string value)

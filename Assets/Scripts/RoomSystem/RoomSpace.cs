@@ -18,7 +18,7 @@ public class RoomSpace : MonoBehaviour
     //[SerializeField] private Transform container;
     //[SerializeField] private Transform playerSample;
     [SerializeField] private GameObject[] tiles;
-    [SerializeField] private GameObject hostTile;
+    //[SerializeField] private GameObject hostTile;
     [SerializeField] private TMP_InputField[] nameFields;
 
     [SerializeField] private TMP_InputField oldNameField;
@@ -26,10 +26,14 @@ public class RoomSpace : MonoBehaviour
     [SerializeField] private TMP_Dropdown map;
     [SerializeField] private GameObject mapName;
 
+    [SerializeField] private TextMeshProUGUI roomName;
+
     //private List<string> playerIds = new List<string>();
     //private int[] tilePositions;
-    private bool nameFieldShowed = false;
+    //private bool nameFieldShowed = false;
     private bool mapShowed = false;
+
+    private int currentIndex = -1;
 
     private void Start()
     {
@@ -132,6 +136,7 @@ public class RoomSpace : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (NetworkManager.Singleton == null) return;
         NetworkManager.Singleton.OnPreShutdown -= OnPreShutdown;
         RoomManager.Instance.OnUpdateRoom -= OnUpdateRoom;
 
@@ -191,17 +196,16 @@ public class RoomSpace : MonoBehaviour
 
         if (session == null) return;
 
-        if (!nameFieldShowed)
-        {
-            ShowNameField();
-        }
+
 
         //playerIds.Clear();
-        List<string> newPlayerIds = new List<string>();
+        //List<string> newPlayerIds = new List<string>();
         //Debug.Log($"session.Players.Count = {session.Players.Count}");
+        int tileIndex = 0;
+        int newCurrentIndex = 0;
         foreach (IReadOnlyPlayer player in session.Players)
         {
-            newPlayerIds.Add(player.Id);
+            //newPlayerIds.Add(player.Id);
             //if (player.Id == AuthenticationService.Instance.PlayerId && RoomManager.Instance.ActiveSession.) continue;
             //player.Properties
             //if (player.Properties[RoomManager.tilePosition].Value == null)
@@ -215,16 +219,21 @@ public class RoomSpace : MonoBehaviour
             //        }
             //    }
             //}
-            var tilePosition = player.Properties[RoomManager.tilePosition].Value;
+            //var tilePosition = player.Properties[RoomManager.tilePosition].Value;
             //Debug.Log($"tilePosition {tilePosition} " + (tilePosition == null));
-            if (tilePosition == null) continue;
-            if (tilePosition == "host")
-            {
-                hostTile.GetComponent<RoomPlayer>().UpdatePlayer(player);
-                continue;
-            }
+            //if (tilePosition == null) continue;
+            //if (tilePosition == "host")
+            //{
+            //    hostTile.GetComponent<RoomPlayer>().UpdatePlayer(player);
+            //    continue;
+            //}
 
-            var playerTile = tiles[int.Parse(tilePosition)];
+            if (player.Id == session.CurrentPlayer.Id)
+            {
+                newCurrentIndex = tileIndex;
+            };
+            //var playerTile = tiles[int.Parse(tilePosition)];
+            var playerTile = tiles[tileIndex++];
             playerTile.SetActive(true);
 
             //Transform playerTransform = Instantiate(playerSample, container);
@@ -237,6 +246,14 @@ public class RoomSpace : MonoBehaviour
             );
             playerUI.UpdatePlayer(player);
         }
+
+        if (currentIndex != newCurrentIndex)
+        {
+            currentIndex = newCurrentIndex;
+            HideNameField();
+            ShowNameField();
+        }
+        //currentIndex = newCurrentIndex;
         //if (RoomManager.Instance.IsHost())
         //{
         //    foreach (string id in playerIds.Except(newPlayerIds))
@@ -303,22 +320,25 @@ public class RoomSpace : MonoBehaviour
         //}
         //Debug.Log($"AvailableSlots = {RoomManager.Instance.ActiveSession.AvailableSlots}");
 
+        roomName.text = session.Name;
     }
 
     private void ColorDisabled(Button button)
     {
-        for (int i = 0; i < 3; i++)
-        {
-            button.transform.GetChild(i).GetComponent<Image>().color = Color.gray;
-        }
+        button.GetComponent<Image>().color = Color.gray;
+        //for (int i = 0; i < 3; i++)
+        //{
+        //    button.transform.GetChild(i).GetComponent<Image>().color = Color.gray;
+        //}
     }
 
     private void ColorEnabled(Button button)
     {
-        for (int i = 0; i < 3; i++)
-        {
-            button.transform.GetChild(i).GetComponent<Image>().color = Color.white;
-        }
+        button.GetComponent<Image>().color = Color.white;
+        //for (int i = 0; i < 3; i++)
+        //{
+        //    button.transform.GetChild(i).GetComponent<Image>().color = Color.white;
+        //}
     }
 
     private void DisableStartButtonHost()
@@ -348,14 +368,14 @@ public class RoomSpace : MonoBehaviour
 
     private void ShowNameField()
     {
-        int index = nameFields.Length - 1;
-        string tilePosition = RoomManager.Instance.ActiveSession.CurrentPlayer.Properties[RoomManager.tilePosition].Value;
-        if (tilePosition != "host")
-        {
-            index = int.Parse(tilePosition);
-        }
-        nameFields[index].gameObject.SetActive(true);
-        nameFieldShowed = true;
+        //int index = nameFields.Length - 1;
+        //string tilePosition = RoomManager.Instance.ActiveSession.CurrentPlayer.Properties[RoomManager.tilePosition].Value;
+        //if (tilePosition != "host")
+        //{
+        //    index = int.Parse(tilePosition);
+        //}
+        nameFields[currentIndex].gameObject.SetActive(true);
+        //nameFieldShowed = true;
     }
 
     private void HideNameField()
@@ -364,15 +384,25 @@ public class RoomSpace : MonoBehaviour
         {
             nameField.gameObject.SetActive(false);
         }
-        nameFieldShowed = false;
+        //nameFieldShowed = false;
     }
 
     public void Show()
     {
         gameObject.SetActive(true);
 
+        //roomName.text = RoomManager.Instance.ActiveSession.Name;
+
         oldNameField.gameObject.SetActive(false);
         //ShowNameField();
+    }
+
+    private void HideTiles()
+    {
+        foreach (var tile in tiles)
+        {
+            tile.SetActive(false);
+        }
     }
 
     public void Hide()
@@ -387,6 +417,10 @@ public class RoomSpace : MonoBehaviour
         mapName.SetActive(false);
         oldNameField.text = RoomManager.Instance.PlayerName;
         oldNameField.gameObject.SetActive(true);
+
+        roomName.text = string.Empty;
+        currentIndex = -1;
+        HideTiles();
 
         gameObject.SetActive(false);
     }

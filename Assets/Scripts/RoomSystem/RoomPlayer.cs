@@ -27,6 +27,7 @@ public class RoomPlayer : MonoBehaviour
 
     public void SetKickPlayerButtonVisible(bool visible)
     {
+        if (kickButton == null) return;
         kickButton.gameObject.SetActive(visible);
     }
 

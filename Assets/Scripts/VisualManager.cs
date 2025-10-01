@@ -257,12 +257,14 @@ public class VisualManager : MonoBehaviour
 
     IEnumerator moveWaiter()
     {
-        yield return new WaitForSeconds(Random.Range(0f, 0.1f));
+        yield return new WaitForSeconds(Random.Range(0.5f, 1f));
         GameHandler.Instance.MakeComputerMove();
     }
 
     private bool PlayableCode(int index, int[] code)
     {
+        //panel[index].GetComponent<DiceUI>().HideAura();
+
         Transform board = GameObject.FindGameObjectWithTag("Board").transform;
         //bool playableDice = false;
         //Debug.Log("playableDice");
@@ -329,6 +331,7 @@ public class VisualManager : MonoBehaviour
 
     public void ReturnHandledButton(int index, bool playableDice)
     {
+        //panel[index].GetComponent<DiceUI>().HideAura();
         if (playableDice)
         {
             panel[index].GetComponent<DiceUI>().Enable();
@@ -352,6 +355,7 @@ public class VisualManager : MonoBehaviour
         for (int i = 0; i < panel.Length; i++)
         {
             panel[i].GetComponent<DiceUI>().Disable();
+            panel[i].GetComponent<DiceUI>().HideAura();
         }
     }
 

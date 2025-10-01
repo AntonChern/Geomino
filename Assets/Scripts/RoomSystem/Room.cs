@@ -5,7 +5,9 @@ using UnityEngine.UI;
 
 public class Room : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI info;
+    [SerializeField] private TextMeshProUGUI sessionName;
+    [SerializeField] private TextMeshProUGUI map;
+    [SerializeField] private TextMeshProUGUI players;
 
     private ISessionInfo session;
 
@@ -43,6 +45,10 @@ public class Room : MonoBehaviour
     {
         this.session = session;
 
-        info.text = $"{session.Name}\t{session.MaxPlayers - session.AvailableSlots}/{session.MaxPlayers}";
+        sessionName.text = session.Name;
+        Debug.Log(session.Properties[RoomManager.mapProperty].Value);
+        map.text = MapHandler.TranslateToRussian(session.Properties[RoomManager.mapProperty].Value);
+        players.text = $"{session.MaxPlayers - session.AvailableSlots}/{session.MaxPlayers}";
+        //info.text = $"{session.Name}\t{session.MaxPlayers - session.AvailableSlots}/{session.MaxPlayers}";
     }
 }

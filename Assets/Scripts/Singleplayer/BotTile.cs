@@ -39,7 +39,7 @@ public class BotTile : MonoBehaviour
             case Difficulty.Easy:
                 return new Color(0f, 0.75f, 0f, 1f);
             case Difficulty.Medium:
-                return Color.blue;
+                return new Color(0.5f, 0.5f, 1f, 1f);
             case Difficulty.Hard:
                 return new Color(0.75f, 0f, 0.75f, 1f);
             case Difficulty.Impossible:

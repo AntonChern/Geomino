@@ -625,13 +625,16 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         switch (difficulties[currentIdTurn - 1])
         {
             case Difficulty.Easy:
-                index = Random.Range(0, availableMoves.Count - 1);
+                //index = Random.Range(0, availableMoves.Count - 1);
+                index = Random.Range(3 * availableMoves.Count / 10, availableMoves.Count / 2);
                 break;
             case Difficulty.Medium:
-                index = Random.Range(availableMoves.Count / 4, availableMoves.Count / 2);
+                //index = Random.Range(availableMoves.Count / 4, availableMoves.Count / 2);
+                index = Random.Range(availableMoves.Count / 10, 3 * availableMoves.Count / 10);
                 break;
             case Difficulty.Hard:
-                index = Random.Range(0, availableMoves.Count / 2);
+                //index = Random.Range(0, availableMoves.Count / 2);
+                index = Random.Range(0, availableMoves.Count / 10);
                 break;
             case Difficulty.Impossible:
                 index = 0;

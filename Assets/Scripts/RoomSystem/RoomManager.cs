@@ -44,7 +44,7 @@ public class RoomManager : MonoBehaviour
 
     public const string playerNamePropertyKey = "playerName";
     public const string mapProperty = "map";
-    public const string tilePosition = "tilePosition";
+    //public const string tilePosition = "tilePosition";
 
     private void Awake()
     {
@@ -123,7 +123,7 @@ public class RoomManager : MonoBehaviour
 
     public void UpdateMap(string value)
     {
-        SessionProperty sessionProperty = new SessionProperty(value, VisibilityPropertyOptions.Member);
+        SessionProperty sessionProperty = new SessionProperty(value, VisibilityPropertyOptions.Public);
         ActiveSession.AsHost().SetProperty(mapProperty, sessionProperty);
         ActiveSession.AsHost().SavePropertiesAsync();
     }
@@ -220,15 +220,16 @@ public class RoomManager : MonoBehaviour
 
     //}
 
-    Dictionary<string, PlayerProperty> GetPlayerProperties(string value)
+    Dictionary<string, PlayerProperty> GetPlayerProperties()
+    //Dictionary<string, PlayerProperty> GetPlayerProperties(string value)
     {
         //var playerName = await AuthenticationService.Instance.GetPlayerNameAsync();
         var playerNameProperty = new PlayerProperty(playerName, VisibilityPropertyOptions.Member);
-        var tilePositionProperty = new PlayerProperty(value, VisibilityPropertyOptions.Member);
+        //var tilePositionProperty = new PlayerProperty(value, VisibilityPropertyOptions.Member);
         return new Dictionary<string, PlayerProperty>
         {
             { playerNamePropertyKey, playerNameProperty },
-            { tilePosition, tilePositionProperty }
+            //{ tilePosition, tilePositionProperty }
         };
     }
 
@@ -253,8 +254,8 @@ public class RoomManager : MonoBehaviour
 
     public async void CreateSessionAsHost(string name, int maxPlayers, bool isPrivate, string map)
     {
-        var playerProperties = GetPlayerProperties("host");
-        var sessionMapProperty = new SessionProperty(map, VisibilityPropertyOptions.Member);
+        var playerProperties = GetPlayerProperties();
+        var sessionMapProperty = new SessionProperty(map, VisibilityPropertyOptions.Public);
 
         var options = new SessionOptions
         {
@@ -278,24 +279,24 @@ public class RoomManager : MonoBehaviour
         //OnUpdateRoom?.Invoke(this, EventArgs.Empty);
     }
 
-    private void SetPlayerTile()
-    {
-        List<int> availablePositions = new List<int>() { 0, 1, 2 };
-        foreach (IReadOnlyPlayer player in ActiveSession.Players)
-        {
-            if (player.Properties[tilePosition].Value == "host" || player.Properties[tilePosition].Value == null) continue;
+    //private void SetPlayerTile()
+    //{
+    //    List<int> availablePositions = new List<int>() { 0, 1, 2 };
+    //    foreach (IReadOnlyPlayer player in ActiveSession.Players)
+    //    {
+    //        if (player.Properties[tilePosition].Value == "host" || player.Properties[tilePosition].Value == null) continue;
 
-            availablePositions.Remove(int.Parse(player.Properties[tilePosition].Value));
-        }
+    //        availablePositions.Remove(int.Parse(player.Properties[tilePosition].Value));
+    //    }
 
-        var tilePositionProperty = new PlayerProperty(availablePositions.Min().ToString(), VisibilityPropertyOptions.Member);
-        ActiveSession.CurrentPlayer.SetProperty(tilePosition, tilePositionProperty);
-        ActiveSession.SaveCurrentPlayerDataAsync();
-    }
+    //    var tilePositionProperty = new PlayerProperty(availablePositions.Min().ToString(), VisibilityPropertyOptions.Member);
+    //    ActiveSession.CurrentPlayer.SetProperty(tilePosition, tilePositionProperty);
+    //    ActiveSession.SaveCurrentPlayerDataAsync();
+    //}
 
     public async void JoinSessionById(string sessionId)
     {
-        var playerProperties = GetPlayerProperties(null);
+        var playerProperties = GetPlayerProperties();
 
         var options = new JoinSessionOptions
         {
@@ -307,7 +308,7 @@ public class RoomManager : MonoBehaviour
 
         //ActiveSession.AsHost().re
 
-        SetPlayerTile();
+        //SetPlayerTile();
         //SetPlayerTileUI(null);
         //networkManager.SceneManager.OnLoad += SceneManager_OnLoad;
         //OnUpdateRoom?.Invoke(this, EventArgs.Empty);
