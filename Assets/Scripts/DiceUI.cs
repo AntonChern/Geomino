@@ -36,6 +36,7 @@ public class DiceUI : MonoBehaviour
                 HideAura();
                 //ChangeColor(gameObject, Color.white);
                 VisualManager.Instance.Unchoose();
+                AudioManager.Instance.Play("DiceDropOut");
             }
             else
             {
@@ -44,6 +45,7 @@ public class DiceUI : MonoBehaviour
                 ShowAura();
                 //ChangeColor(gameObject, Color.yellow);
                 VisualManager.Instance.Choose(index, code);
+                AudioManager.Instance.Play("DicePickUp");
             }
         });
         startButtonPosition = transform.position;

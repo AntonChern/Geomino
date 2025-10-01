@@ -46,6 +46,7 @@ public class WinnerGraph : MonoBehaviour
         exitButton.gameObject.SetActive(false);
         slideButton.onClick.AddListener(() =>
         {
+            AudioManager.Instance.Play("Sliding");
             SlideGraph();
         });
 
@@ -132,8 +133,12 @@ public class WinnerGraph : MonoBehaviour
     public void Draw()
     {
         //Debug.Log("GenerateGraph");
+        AudioManager.Instance.GraduallyStop("GameBackground");
+        AudioManager.Instance.Play("Drawing");
+
         gameObject.SetActive(true);
         exitButton.gameObject.SetActive(true);
+
         //winnerGraph.SetActive(true);
 
         float graphWidth = graphContainer.rect.width;

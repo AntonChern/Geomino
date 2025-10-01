@@ -136,9 +136,9 @@ public class RoomSpace : MonoBehaviour
 
     private void OnDestroy()
     {
+        RoomManager.Instance.OnUpdateRoom -= OnUpdateRoom;
         if (NetworkManager.Singleton == null) return;
         NetworkManager.Singleton.OnPreShutdown -= OnPreShutdown;
-        RoomManager.Instance.OnUpdateRoom -= OnUpdateRoom;
 
         //NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnectedCallback;
     }
@@ -426,6 +426,7 @@ public class RoomSpace : MonoBehaviour
     public void Hide()
     {
         //startGameButton.gameObject.SetActive(false);
+        //if (startGameButton != null)
         startGameButton.enabled = false;
         ColorDisabled(startGameButton);
         //leaveGameButton.gameObject.SetActive(false);

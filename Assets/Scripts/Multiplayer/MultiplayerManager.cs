@@ -566,6 +566,8 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     [Rpc(SendTo.ClientsAndHost)]
     private void DiceRpc(Vector2 position, int[] code)
     {
+        if (Vector2.Distance(Vector2.zero, position) > Mathf.Epsilon)
+            AudioManager.Instance.Play("Dice");
         VisualManager.Instance.Dice(position, code);
     }
 

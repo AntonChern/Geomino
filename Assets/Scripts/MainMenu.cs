@@ -8,6 +8,10 @@ public class MainMenu : MonoBehaviour
 
     [SerializeField] private Button singleplayerButton;
     [SerializeField] private Button multiplayerButton;
+    [SerializeField] private Button audioButton;
+    //[SerializeField] private Button menuButton;
+
+    //[SerializeField] private GameObject audioMenu;
     //[SerializeField] private Button exitButton;
 
     //[SerializeField] private GameObject exitMessage;
@@ -30,6 +34,16 @@ public class MainMenu : MonoBehaviour
         {
             SceneManager.LoadScene("RoomSystem", LoadSceneMode.Single);
         });
+        audioButton.onClick.AddListener(() =>
+        {
+            AudioMenu.Instance.Show();
+            Hide();
+        });
+        //menuButton.onClick.AddListener(() =>
+        //{
+        //    audioMenu.SetActive(false);
+        //    Show();
+        //});
 
         if (RoomManager.Instance != null)
         {

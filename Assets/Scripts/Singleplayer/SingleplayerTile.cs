@@ -46,6 +46,7 @@ public class SingleplayerTile : MonoBehaviour, ITile
 
     public void Dice()
     {
+        //AudioManager.Instance.Play("Dice");
         SynchronizeCodes();
         //Debug.Log("CODE = " + code[0] + ", " + code[1] + ", " + code[2]);
         //Debug.Log("TEMP CODE = " + temporaryCode[0] + ", " + temporaryCode[1] + ", " + temporaryCode[2]);

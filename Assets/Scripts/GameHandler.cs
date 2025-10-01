@@ -36,6 +36,8 @@ public class GameHandler : MonoBehaviour
                 gameManager = multiplayerManager.GetComponent<MultiplayerManager>();
             }
         }
+
+        //AudioManager.Instance.Play("GameBackground");
     }
 
     public void SkipMove()
@@ -50,6 +52,7 @@ public class GameHandler : MonoBehaviour
 
     public void MakeMove(Vector2 position, bool state, int[] code)
     {
+        //AudioManager.Instance.Play("Dice");
         VisualManager.Instance.MakeMove();
         gameManager.MakeMove(position, state, code);
     }
@@ -61,6 +64,7 @@ public class GameHandler : MonoBehaviour
 
     public void MakeComputerMove()
     {
+        AudioManager.Instance.Play("Dice");
         gameManager.MakeComputerMove();
     }
 

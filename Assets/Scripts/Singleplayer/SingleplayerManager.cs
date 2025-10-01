@@ -205,6 +205,8 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
     private void Dice(Vector2 position, int[] code)
     {
+        if (Vector2.Distance(Vector2.zero, position) > Mathf.Epsilon)
+            AudioManager.Instance.Play("Dice");
         VisualManager.Instance.Dice(position, code);
     }
 

@@ -26,6 +26,10 @@ public class ScoreText : MonoBehaviour
     private Color GetColor(int value)
     {
         Color result = Color.white;
+        if (value > 6)
+        {
+            AudioManager.Instance.Play("Bonus");
+        }
         switch (value)
         {
             case 1:

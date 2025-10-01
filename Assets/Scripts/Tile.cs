@@ -126,6 +126,7 @@ public class Tile : MonoBehaviour//, ITile
         pointerDown = false;
         //Debug.Log("Clicked! " + transform.position);
         gameObject.GetComponent<ITile>().Dice();
+        
         //MultiplayerGameManager.instance.Boob();
     }
 
