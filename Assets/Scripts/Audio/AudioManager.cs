@@ -13,6 +13,8 @@ public class AudioManager : MonoBehaviour
 
     public static AudioManager Instance;
 
+    private Coroutine stopGameBackground;
+
     //public bool soundPlaying = true;
     //public bool gaming = false;
     //private string currentBackground;
@@ -204,7 +206,18 @@ public class AudioManager : MonoBehaviour
 
         if (arg0.name == "MainMenu" || arg0.name == "RoomSystem")
         {
-            Stop("GameBackground");
+            //Stop("GameBackground");
+            if (stopGameBackground != null)
+            {
+                StopCoroutine(stopGameBackground);
+
+                Sound sound = Array.Find(music, sound => sound.name == "GameBackground");
+                if (sound != null)
+                {
+                    sound.source.volume = sound.volume;
+                }
+            }
+            StopAllBut("MenuBackground");
             Sound s = Array.Find(music, sound => sound.name == "MenuBackground");
             if (s == null)
             {
@@ -274,7 +287,11 @@ public class AudioManager : MonoBehaviour
             return;
         }
         if (s.source != null && s.source.isPlaying)
+        {
+            //Debug.Log($"Stop coroutine {s.name}");
+            //StopCoroutine(stopGameBackground);
             s.source.Stop();
+        }
     }
 
     public void GraduallyStop(string name)
@@ -285,7 +302,7 @@ public class AudioManager : MonoBehaviour
             Debug.LogWarning("Sound: " + name + " not found!");
             return;
         }
-        StartCoroutine(StopAudioWaiter(s));
+        stopGameBackground = StartCoroutine(StopAudioWaiter(s));
     }
 
     IEnumerator StopAudioWaiter(Sound s)
@@ -305,6 +322,7 @@ public class AudioManager : MonoBehaviour
         //    yield return new WaitForSeconds(step);
         //}
         Stop(s.name);
+        Debug.Log("Stopped");
         s.source.volume = maxVolume;
     }
 
@@ -312,6 +330,15 @@ public class AudioManager : MonoBehaviour
     {
         foreach (Sound s in sounds.Union(music).ToArray())
         {
+            s.source.Stop();
+        }
+    }
+
+    public void StopAllBut(string name)
+    {
+        foreach (Sound s in sounds.Union(music).ToArray())
+        {
+            if (s.name == name) continue;
             s.source.Stop();
         }
     }
