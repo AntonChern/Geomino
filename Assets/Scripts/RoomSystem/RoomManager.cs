@@ -84,6 +84,7 @@ public class RoomManager : MonoBehaviour
             //networkManager.OnSessionOwnerPromoted += OnSessionOwnerPromoted;
             //networkManager.SceneManager.OnLoad += SceneManager_OnLoad;
             //Debug.Log(networkManager.SceneManager == null);
+            SceneManager.sceneLoaded += SceneLoaded;
 
             //Debug.Log($"Initialized? {UnityServices.State == ServicesInitializationState.Initialized}");
             //if (UnityServices.State != ServicesInitializationState.Initialized)
@@ -99,15 +100,28 @@ public class RoomManager : MonoBehaviour
         }
     }
 
+    private void SceneLoaded(Scene arg0, LoadSceneMode arg1)
+    {
+        switch (arg0.name)
+        {
+            case "MainMenu":
+                AuthenticationService.Instance.SignOut();
+                break;
+            //case "RoomSystem":
+
+            //    break;
+        }
+    }
+
     private void OnDestroy()
     {
-        //UnityServices.
+        SceneManager.sceneLoaded += SceneLoaded;
         //Debug.Log($"Sign Out");
-        if (IsHost())
-        {
-            ActiveSession.AsHost().DeleteAsync();
-        }
-        AuthenticationService.Instance.SignOut();
+        //if (IsHost())
+        //{
+        //    ActiveSession.AsHost().DeleteAsync();
+        //}
+        //AuthenticationService.Instance.SignOut();
     }
 
     private void Update()
