@@ -30,7 +30,6 @@ public class DiceUI : MonoBehaviour
     {
         gameObject.GetComponent<Button>().onClick.AddListener(() =>
         {
-            //if (GetComponent<Image>().color == Color.green)
             if (aura.activeInHierarchy)
             {
                 HideAura();
@@ -41,9 +40,7 @@ public class DiceUI : MonoBehaviour
             else
             {
                 NullAuras();
-                //ChangeColor(gameObject, Color.green);
                 ShowAura();
-                //ChangeColor(gameObject, Color.yellow);
                 VisualManager.Instance.Choose(index, code);
                 AudioManager.Instance.Play("DicePickUp");
             }
@@ -75,7 +72,6 @@ public class DiceUI : MonoBehaviour
 
     public void Disable()
     {
-        //ChangeColor(gameObject, Color.gray);
         ChangeColor(gameObject, new Color(0.375f, 0.375f, 0.375f, 1f));
         gameObject.GetComponent<Button>().enabled = false;
     }
@@ -91,7 +87,6 @@ public class DiceUI : MonoBehaviour
         foreach (GameObject diceUI in GameObject.FindGameObjectsWithTag("DiceUI"))
         {
             if (!diceUI.GetComponent<Button>().enabled) continue;
-            //ChangeColor(diceUI, Color.white);
             diceUI.GetComponent<DiceUI>().HideAura();
         }
     }

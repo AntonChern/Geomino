@@ -49,8 +49,6 @@ public class ScoreText : MonoBehaviour
             case 9:
             case 10:
             case 11:
-                //result = new Color(0.75f, 0.75f, 0f, 1f);
-                //break;
             case 12:
             case 13:
             case 14:
@@ -60,7 +58,6 @@ public class ScoreText : MonoBehaviour
                 result = new Color(1f, 0f, 0f, 1f);
                 break;
             default:
-                //result = new Color(0.75f, 0.75f, 0f, 1f);
                 result = Color.white;
                 break;
         }

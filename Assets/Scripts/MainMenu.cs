@@ -9,13 +9,6 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Button singleplayerButton;
     [SerializeField] private Button multiplayerButton;
     [SerializeField] private Button audioButton;
-    //[SerializeField] private Button menuButton;
-
-    //[SerializeField] private GameObject audioMenu;
-    //[SerializeField] private Button exitButton;
-
-    //[SerializeField] private GameObject exitMessage;
-    //[SerializeField] private SingleplayerMenu singleplayerMenu;
 
     private void Awake()
     {
@@ -26,7 +19,6 @@ public class MainMenu : MonoBehaviour
     {
         singleplayerButton.onClick.AddListener(() =>
         {
-            //SceneManager.LoadScene("MultiplayerGame", LoadSceneMode.Single);
             SingleplayerMenu.Instance.Show();
             Hide();
         });
@@ -39,26 +31,12 @@ public class MainMenu : MonoBehaviour
             AudioMenu.Instance.Show();
             Hide();
         });
-        //menuButton.onClick.AddListener(() =>
-        //{
-        //    audioMenu.SetActive(false);
-        //    Show();
-        //});
 
         if (RoomManager.Instance != null)
         {
             Destroy(RoomManager.Instance.gameObject);
         }
     }
-
-    //private void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.Escape))
-    //    {
-    //        gameObject.SetActive(exitMessage.activeInHierarchy);
-    //        exitMessage.SetActive(!exitMessage.activeInHierarchy);
-    //    }
-    //}
 
     public void Show()
     {

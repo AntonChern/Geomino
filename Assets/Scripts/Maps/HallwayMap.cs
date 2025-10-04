@@ -19,7 +19,6 @@ public class HallwayMap : MonoBehaviour, IMap
             Destroy(gameObject);
             return;
         }
-        //places.gameObject.SetActive(true);
         places = Instantiate(placesPrefab, gameObject.transform);
 
         backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;

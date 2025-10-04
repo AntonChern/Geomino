@@ -14,12 +14,10 @@ public class PlayersHandler : MonoBehaviour
     {
         addBot2Button.onClick.AddListener(() =>
         {
-            //addBot2Button.gameObject.SetActive(false);
             bot2Tile.SetActive(true);
         });
         addBot3Button.onClick.AddListener(() =>
         {
-            //addBot3Button.gameObject.SetActive(false);
             bot3Tile.SetActive(true);
         });
     }

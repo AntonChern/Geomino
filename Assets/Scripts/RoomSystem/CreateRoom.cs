@@ -24,7 +24,6 @@ public class CreateRoom : MonoBehaviour
         createRoomButton.onClick.AddListener(() =>
         {
             RoomManager.Instance.CreateSessionAsHost(roomName.text, int.Parse(players.options[players.value].text), isPrivate.isOn, MapHandler.TranslateToEnglish(map.options[map.value].text));
-            //RoomManager.Instance.CreateSessionAsHost(roomName.text, isPrivate.isOn, map.options[map.value].text);
             Hide();
             RoomSpace.Instance.Show();
         });
@@ -57,27 +56,6 @@ public class CreateRoom : MonoBehaviour
                 }
             }
         });
-        //map.onValueChanged.AddListener((int value) =>
-        //{
-        //switch (map.options[value].text)
-        //{
-        //    case "Бесконечная":
-        //        PlayerPrefs.SetString("map", "infinity");
-        //        break;
-        //    case "Коридор":
-        //        PlayerPrefs.SetString("map", "hallway");
-        //        break;
-        //    case "Гексагон":
-        //        PlayerPrefs.SetString("map", "hexagon");
-        //        break;
-        //    case "Колонны":
-        //        PlayerPrefs.SetString("map", "columns");
-        //        break;
-        //}
-        //PlayerPrefs.Save();
-        //});
-        //PlayerPrefs.SetString("map", "infinity");
-        //PlayerPrefs.Save();
 
         Hide();
 

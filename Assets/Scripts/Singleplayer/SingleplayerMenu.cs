@@ -10,7 +10,6 @@ public class SingleplayerMenu : MonoBehaviour
     [SerializeField] private Button startGameButton;
     [SerializeField] private Button cancelButton;
     [SerializeField] private TMP_InputField playerName;
-    //[SerializeField] private TMP_Dropdown computers;
     [SerializeField] private TMP_Dropdown map;
 
     [SerializeField] private GameObject[] players;
@@ -32,7 +31,6 @@ public class SingleplayerMenu : MonoBehaviour
                 {
                     if (player.GetComponent<BotTile>() != null)
                     {
-                        //Debug.Log($"difficulty{botsCount} {(int)player.GetComponent<BotTile>().GetDifficulty()}");
                         PlayerPrefs.SetInt($"difficulty{botsCount++}", (int)player.GetComponent<BotTile>().GetDifficulty());
                     }
                     playersCount++;
@@ -53,38 +51,15 @@ public class SingleplayerMenu : MonoBehaviour
             PlayerPrefs.SetString("playerName", value);
             PlayerPrefs.Save();
         });
-        //computers.onValueChanged.AddListener((int value) =>
-        //{
-        //    PlayerPrefs.SetInt("players", int.Parse(computers.options[value].text) + 1);
-        //    PlayerPrefs.Save();
-        //});
         map.onValueChanged.AddListener((int value) =>
         {
-            //switch (map.options[value].text)
-            //{
-            //    case "Бесконечная":
-            //        PlayerPrefs.SetString("map", "infinity");
-            //        break;
-            //    case "Коридор":
-            //        PlayerPrefs.SetString("map", "hallway");
-            //        break;
-            //    case "Гексагон":
-            //        PlayerPrefs.SetString("map", "hexagon");
-            //        break;
-            //    case "Колонны":
-            //        PlayerPrefs.SetString("map", "columns");
-            //        break;
-            //}
             PlayerPrefs.SetString("map", MapHandler.TranslateToEnglish(map.options[value].text));
             PlayerPrefs.Save();
         });
 
-        //Debug.Log(computers.value);
         PlayerPrefs.SetString("map", "infinity");
-        //PlayerPrefs.SetInt("players", int.Parse(computers.options[computers.value].text) + 1);
         PlayerPrefs.SetInt("players", 2);
         PlayerPrefs.Save();
-        //Debug.Log(PlayerPrefs.GetString("map"));
 
         Hide();
     }

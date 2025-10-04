@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 public class MapManager : MonoBehaviour
 {
@@ -7,33 +6,17 @@ public class MapManager : MonoBehaviour
     private IMap map;
 
     [SerializeField] private GameObject background;
-    //[SerializeField] private GameObject hallwayWalls;
     private Vector2 backgroundOffset;
 
     private void Awake()
     {
         Instance = this;
-
-        //switch (PlayerPrefs.GetString("map"))
-        //{
-        //    case "infinity":
-        //        //Debug.Log("infinity");
-        //        map = new InfinityMap();
-        //        break;
-        //    case "hallway":
-        //        //Debug.Log("коридор");
-        //        map = new HallwayMap();
-        //        break;
-
-        //}
     }
 
     private void Start()
     {
         backgroundOffset = background.GetComponent<Renderer>().material.mainTextureOffset;
 
-        //Debug.Log("children " + transform.childCount);
-        //map = transform.GetChild(0).GetComponent<IMap>();
         for (int i = 0; i < transform.childCount; i++)
         {
             if (transform.GetChild(i).gameObject.activeInHierarchy)
@@ -42,7 +25,6 @@ public class MapManager : MonoBehaviour
                 break;
             }
         }
-        //map = Camera.main.transform
     }
 
     public bool CanBePlaced(Vector2 position)

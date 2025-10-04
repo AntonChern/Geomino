@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class Scaler : MonoBehaviour
 {
-    public float minOrthoSize = 5f; // Минимальное значение orthographicSize
-    public float maxOrthoSize = 15f; // Максимальное значение orthographicSize
-    public float zoomSpeed = 1f; // Скорость изменения orthographicSize
+    public float minOrthoSize = 5f;
+    public float maxOrthoSize = 15f;
+    public float zoomSpeed = 1f;
 
     private Camera cam;
 

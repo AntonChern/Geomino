@@ -1,6 +1,5 @@
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class InfinityMap : MonoBehaviour, IMap
 {
@@ -19,7 +18,6 @@ public class InfinityMap : MonoBehaviour, IMap
             Destroy(gameObject);
             return;
         }
-        //places.SetActive(true);
         places = Instantiate(placesPrefab, gameObject.transform);
         backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
     }

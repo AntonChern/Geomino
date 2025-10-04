@@ -4,7 +4,6 @@ using UnityEngine;
 public class HexagonMap : MonoBehaviour, IMap
 {
     [SerializeField] private GameObject placesPrefab;
-    //private GameObject places;
 
     private float radius = 4f * Mathf.Sqrt(3) / 2;
     private Vector2 offset = new Vector2(0f, Mathf.Sqrt(3) / 3);
@@ -20,7 +19,6 @@ public class HexagonMap : MonoBehaviour, IMap
             Destroy(gameObject);
             return;
         }
-        //places.gameObject.SetActive(true);
         Instantiate(placesPrefab, gameObject.transform);
     }
 

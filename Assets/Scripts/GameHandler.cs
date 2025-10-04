@@ -1,5 +1,3 @@
-using NUnit.Framework;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -13,8 +11,6 @@ public class GameHandler : MonoBehaviour
     [SerializeField] private GameObject exitMessage;
 
     public IGameManager gameManager;
-
-    //private int players;
 
     private void Awake()
     {
@@ -36,8 +32,6 @@ public class GameHandler : MonoBehaviour
                 gameManager = multiplayerManager.GetComponent<MultiplayerManager>();
             }
         }
-
-        //AudioManager.Instance.Play("GameBackground");
     }
 
     public void SkipMove()
@@ -52,7 +46,6 @@ public class GameHandler : MonoBehaviour
 
     public void MakeMove(Vector2 position, bool state, int[] code)
     {
-        //AudioManager.Instance.Play("Dice");
         VisualManager.Instance.MakeMove();
         gameManager.MakeMove(position, state, code);
     }

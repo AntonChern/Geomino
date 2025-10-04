@@ -15,13 +15,7 @@ public class Room : MonoBehaviour
     {
         GetComponent<Button>().onClick.AddListener(async () =>
         {
-            //if (session..AvailableSlots == session.MaxPlayers)
-            //{
-            //    return;
-            //}
-            //if (session == null) return;
             var existingSessions = await RoomManager.Instance.QuerySessions();
-            //var sessions = await MultiplayerService.Instance.QuerySessionsAsync();
             foreach (var existingSession in existingSessions)
             {
                 if (existingSession.Id == session.Id)
@@ -34,10 +28,6 @@ public class Room : MonoBehaviour
                 }
             }
             Debug.Log($"Session {session.Id} doesn't exist");
-            //if (!sessions.Contains(session.Id))
-            //{
-            //    return;
-            //}
         });
     }
 
@@ -49,6 +39,5 @@ public class Room : MonoBehaviour
         Debug.Log(session.Properties[RoomManager.mapProperty].Value);
         map.text = MapHandler.TranslateToRussian(session.Properties[RoomManager.mapProperty].Value);
         players.text = $"{session.MaxPlayers - session.AvailableSlots}/{session.MaxPlayers}";
-        //info.text = $"{session.Name}\t{session.MaxPlayers - session.AvailableSlots}/{session.MaxPlayers}";
     }
 }

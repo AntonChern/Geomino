@@ -21,9 +21,8 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         get { return currentIdTurn; }
         set
         {
-            if (currentIdTurn == value) return; // Prevent unnecessary events if value is the same
+            if (currentIdTurn == value) return;
             currentIdTurn = value;
-            // Invoke the event if there are any listeners
             OnCurrentIdTurnChanged?.Invoke(currentIdTurn);
         }
     }
@@ -52,7 +51,6 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         players = PlayerPrefs.GetInt("players");
 
         OnCurrentIdTurnChanged += OnTurnChanged;
-        //Debug.Log(players);
 
         foreach (var board in GameObject.FindGameObjectsWithTag("Board"))
         {
@@ -61,13 +59,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
                 Destroy(board);
             }
         }
-        //Destroy(GameObject.FindGameObjectWithTag("Board").GetComponent<NetworkObject>());
     }
-
-    //private void OnTurnChanged(int obj)
-    //{
-    //    throw new NotImplementedException();
-    //}
 
     private void Start()
     {
@@ -86,29 +78,19 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         difficulties = new Difficulty[players - 1];
         for (int i = 0; i < players - 1; i++)
         {
-            //Debug.Log($"difficulty{i} {(Difficulty)PlayerPrefs.GetInt($"difficulty{i}")}");
             difficulties[i] = (Difficulty)PlayerPrefs.GetInt($"difficulty{i}");
         }
     }
 
     private void HandleTurn()
     {
-        //VisualManager.Instance.RefreshHand();
         if (currentIdTurn == 0)
         {
-            //VisualManager.Instance.ShowPlaces();
             VisualManager.Instance.RefreshHand();
-            //OnBeginMove?.Invoke(this, EventArgs.Empty);
-            // RefreshHand
-            //CheckMoves();
         }
         else
         {
             VisualManager.Instance.CheckComputerMoves(hands[currentIdTurn - 1]);
-            // computer
-            // проверить, есть ли хоть что-то, что можно поставить
-            // если да  => ничего не делаем
-            // если нет => SkipMove();
         }
     }
 
@@ -116,8 +98,6 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     {
         for (int i = 0; i < players; i++)
         {
-            //Debug.Log(i == 0 ? PlayerPrefs.GetString("playerName") : $"Компьютер {i}");
-            //if (i != 0) Debug.Log($"{i - 1} {difficulties[i - 1]} {DifficultyHandler.Translate(difficulties[i - 1])}");
             Scoreboard.Instance.SetPlayer(i, i == 0 ? PlayerPrefs.GetString("playerName") : $"Бот {DifficultyHandler.Translate(difficulties[i - 1])}");
         }
     }
@@ -127,40 +107,20 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         Bag.Instance.UpdateBag(size);
     }
 
-    //private void ReturnDiceRpc(ulong clientId, int[] result)
-    //{
-    //    if (NetworkManager.Singleton.LocalClientId == clientId)
-    //    {
-    //        //if (result != null)
-    //        //    Debug.Log("Recieved " + result[0] + ", " + result[1] + ", " + result[2]);
-    //        VisualManager.Instance.GenerateDiceUI(result);
-    //    }
-    //}
-
     public int[] GetDice(int index)
     {
         if (bag.Count == 0)
         {
-            //ReturnDiceRpc(clientId, null);
             return null;
         }
         int[] result = bag[index];
         bag.RemoveAt(index);
-        // изменить переменную, ответственную за количество оставшихся фишек
         UpdateBagSize(bag.Count);
-        //return result;
-        //Debug.Log("Bag count = " + bag.Count);
-        //ReturnDiceRpc(clientId, result);
         return result;
-        //int[] result = new int[3] { bag[index] / 100, bag[index] / 10 % 10, bag[index] % 10 };
-        //bag.RemoveAt(index);
-        //return result;
     }
 
     public int[] GetDice()
     {
-        //return GetDiceRpc(UnityEngine.Random.Range(0, bag.Count - 1));
-        //int[] result = GetDiceRpc(clientId, UnityEngine.Random.Range(0, bag.Count - 1));
         return GetDice(Random.Range(0, bag.Count - 1));
     }
 
@@ -171,11 +131,9 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
             VisualManager.Instance.GenerateDiceUI(GetDice());
         }
 
-        //Debug.Log($"Player Hand Generated");
         hands = new List<int[][]>();
         for (int i = 0; i < players - 1; i++)
         {
-            //Debug.Log(GameObject.FindGameObjectsWithTag("DiceUI").Length);
             int[][] hand = new int[dices][];
             for (int j = 0; j < dices; j++)
             {
@@ -183,7 +141,6 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
             }
             hands.Add(hand);
         }
-        //Debug.Log($"Computer Hands Generated");
     }
 
     private void SpawnInitialObject()
@@ -212,15 +169,9 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
     private void SpawnPlace(Vector2 position, bool state)
     {
-        //Debug.Log("SpawnPlace");
         Transform tile = Instantiate(tilePrefab, position, Quaternion.Euler(0f, 0f, state ? 180 : 0));
-        //Destroy(tile.gameObject.GetComponent<NetworkObject>());
-        //Destroy(tile.gameObject.GetComponent<NetworkTransform>());
-        //Destroy(tile.gameObject.GetComponent<MultiplayerTile>());
         tile.GetComponent<SingleplayerTile>().SetState(state);
-        //Debug.Log($"trans { tile == null}");
         tile.SetParent(GameObject.FindGameObjectWithTag("Board").transform);
-        //tile.gameObject.GetComponent<Tile>().code[index] = value;
     }
 
     private void SetCode(Vector2 targetCoordinates, int index, int value)
@@ -240,10 +191,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     {
         Dice(position, code);
 
-        //Collider2D hit = Physics2D.OverlapPoint(position);
-
         float originAngle = (state ? Mathf.PI : 0) - Mathf.PI / 2;
-        //move++;
         int value = 0;
         for (int i = 0; i < faces; i++)
         {
@@ -279,8 +227,6 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
             if (hit.CompareTag("Dice"))
             {
                 return value;
-                //scores[currentIdTurn] += value;
-                //OnScoresChanged();
             }
         }
         return 0;
@@ -371,48 +317,12 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         }
     }
 
-    //public bool RefreshHand()
-    //{
-    //    bool answer = false;
-    //    foreach (GameObject diceUI in GameObject.FindGameObjectsWithTag("DiceUI"))
-    //    {
-    //        Transform board = GameObject.FindGameObjectWithTag("Board").transform;
-    //        for (int i = 0; i < board.childCount; i++)
-    //        {
-    //            GameObject place = board.GetChild(i).gameObject;
-    //            if (!place.CompareTag("Place"))
-    //                continue;
-
-    //            if (VisualManager.Instance.Suits(place, diceUI.GetComponent<DiceUI>().Code))
-    //            {
-    //                answer = true;
-    //                diceUI.GetComponent<DiceUI>().Enable();
-    //            }
-    //            else
-    //            {
-    //                diceUI.GetComponent<DiceUI>().Disable();
-    //            }
-    //        }
-    //    }
-    //    return answer;
-    //}
-
     public void MakeMove(Vector2 position, bool state, int[] code)
     {
         ConstructTilesAround(position, state, code);
         VisualManager.Instance.GenerateDiceUI(GetDice());
         NullSkippedPlayers();
         ChangeTurn();
-
-        //if (players == skippedPlayers)
-        //{
-        //    return;
-        //}
-
-        //for (int i = 0; i < players - 1; i++)
-        //{
-        //    MakeComputerMove();
-        //}
     }
 
     private int CountDicesInPractice(int[] code)
@@ -440,20 +350,16 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
                 continue;
             if (Suits(code, dice.GetComponent<ITile>().GetCode()))
             {
-                //Debug.Log($"DICE {i}");
                 suitableDicesInPractice++;
             }
         }
-        //int gaga = 0;
         foreach (int[] diceCode in hands[currentIdTurn - 1])
         {
             if (diceCode == null) continue;
             if (Suits(code, diceCode))
             {
-                //Debug.Log($"GAGA {gaga}");
                 suitableDicesInPractice++;
             }
-            //gaga++;
         }
         return suitableDicesInPractice;
     }
@@ -484,14 +390,6 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
     private float CountProbabilityForPlace(int[] code)
     {
-        // кол-во костяшек, вкл code в теории - кол-во костяшек, вкл code на доске и на руке у текущего компа
-        // разделить
-        // 71 - (кол-во костяшек на доске + 4)
-        //int SuitableDicesInTheory = 0;
-        //int SuitableDicesInPractice = 0;
-        //int DicesInTheory = 0;
-        //int DicesInPractice = 0;
-
         if ((float)(CountSuitableDicesInTheory(code) - CountSuitableDicesInPractice(code)) / (71 - (hands[currentIdTurn - 1].Count(x => x != null) + CountDicesInPractice(code))) < 0f)
         {
             Debug.Log($"code {string.Join(" ", code)}");
@@ -544,8 +442,6 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
                     int[] placeCode = new int[3] { -1, -1, -1 }; ;
                     placeCode[i] = code[i];
                     value -= code[i] * CountProbabilityForPlace(placeCode);
-                    //Debug.Log($"({CountSuitableDicesInTheory(placeCode)} - {CountSuitableDicesInPractice(placeCode)}) / ({71} - {4 + CountDicesInPractice(placeCode)}) = {(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode))} / {71 - (4 + CountDicesInPractice(placeCode))} = {(float)(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode)) / (71 - (4 + CountDicesInPractice(placeCode)))}");
-                    //Debug.Log($"Value minus {code[i]} * {CountProbabilityForPlace(placeCode)} = {code[i] * CountProbabilityForPlace(placeCode)}");
                 }
             }
             else
@@ -553,7 +449,6 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
                 if (hitCollider.CompareTag("Dice"))
                 {
                     value += candidatePlace.GetComponent<ITile>().GetCode()[i];
-                    //Debug.Log($"Value plus {candidatePlace.GetComponent<ITile>().GetCode()[i]}");
                 }
                 if (hitCollider.CompareTag("Place"))
                 {
@@ -561,8 +456,6 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
                     placeCode[i] = code[i];
 
                     value -= (CountValueForPlace(hitCollider.gameObject) + code[i]) * CountProbabilityForPlace(placeCode);
-                    //Debug.Log($"({CountSuitableDicesInTheory(placeCode)} - {CountSuitableDicesInPractice(placeCode)}) / ({71} - {4 + CountDicesInPractice(placeCode)}) = {(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode))} / {71 - (4 + CountDicesInPractice(placeCode))} = {(float)(CountSuitableDicesInTheory(placeCode) - CountSuitableDicesInPractice(placeCode)) / (71 - (4 + CountDicesInPractice(placeCode)))}");
-                    //Debug.Log($"Value minus {CountValueForPlace(hitCollider.gameObject) + code[i]} * {CountProbabilityForPlace(placeCode)} = {(CountValueForPlace(hitCollider.gameObject) + code[i]) * CountProbabilityForPlace(placeCode)}");
                 }
             }
         }
@@ -574,14 +467,11 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
             GameObject place = board.GetChild(i).gameObject;
             if (!place.CompareTag("Place"))
                 continue;
-            // не учитывать те, что рядом с placeIndex
             if (Vector2.Distance(place.transform.position, board.GetChild(placeIndex).position) < Mathf.Sqrt(3) / 3 + Mathf.Epsilon)
             {
                 continue;
             }
             value -= CountValueForPlace(place) * CountProbabilityForPlace(place.GetComponent<ITile>().GetCode());
-            //Debug.Log($"({CountSuitableDicesInTheory(place.GetComponent<ITile>().GetCode())} - {CountSuitableDicesInPractice(place.GetComponent<ITile>().GetCode())}) / ({71} - {4 + CountDicesInPractice(place.GetComponent<ITile>().GetCode())}) = {(CountSuitableDicesInTheory(place.GetComponent<ITile>().GetCode()) - CountSuitableDicesInPractice(place.GetComponent<ITile>().GetCode()))} / {71 - (4 + CountDicesInPractice(place.GetComponent<ITile>().GetCode()))} = {(float)(CountSuitableDicesInTheory(place.GetComponent<ITile>().GetCode()) - CountSuitableDicesInPractice(place.GetComponent<ITile>().GetCode())) / (71 - (4 + CountDicesInPractice(place.GetComponent<ITile>().GetCode())))}");
-            //Debug.Log($"Value minus {CountValueForPlace(place)} * {CountProbabilityForPlace(place.GetComponent<ITile>().GetCode())} = {CountValueForPlace(place) * CountProbabilityForPlace(place.GetComponent<ITile>().GetCode())}");
         }
 
         availableMoves.Add((diceIndex, placeIndex, value));
@@ -609,15 +499,9 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         {
             int[] code = hand[i];
             if (code == null || disabledComputerDices.Contains(i)) continue;
-            //Debug.Log($"Dice for {string.Join(" ", code)}");
             CalculateMovesForDice(i, code);
         }
         availableMoves.Sort((x, y) => y.Item3.CompareTo(x.Item3));
-        //foreach (var s in availableMoves)
-        //{
-        //    Debug.Log($"{s.Item1} {s.Item2} {s.Item3}");
-        //}
-        //Debug.Log("===========================================================================");
         return GetMoveByDifficulty();
     }
 
@@ -627,17 +511,12 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         switch (difficulties[currentIdTurn - 1])
         {
             case Difficulty.Easy:
-                //index = Random.Range(0, availableMoves.Count - 1);
-                //index = Random.Range(3 * availableMoves.Count / 10, availableMoves.Count / 2);
                 index = Random.Range(0, availableMoves.Count / 2);
                 break;
             case Difficulty.Medium:
-                //index = Random.Range(availableMoves.Count / 4, availableMoves.Count / 2);
-                //index = Random.Range(availableMoves.Count / 10, 3 * availableMoves.Count / 10);
                 index = Random.Range(0, 3 * availableMoves.Count / 10);
                 break;
             case Difficulty.Hard:
-                //index = Random.Range(0, availableMoves.Count / 2);
                 index = Random.Range(0, availableMoves.Count / 10);
                 break;
             case Difficulty.Impossible:
@@ -649,32 +528,11 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
     public void MakeComputerMove()
     {
-        //for (int i = 0; i < players - 1; i++)
-        //{
-        //    Debug.Log($"{i + 1} Disabled Dices {string.Join(" ", disabledComputerDices)} {disabledComputerDices.Count}");
-        //}
-        //for (int i = 0; i < players - 1; i++)
-        //{
-        //    string res = "[";
-        //    for (int j = 0; j < 4; j++)
-        //    {
-        //        if (hands[i][j] == null) { res += "NULL, "; continue; }
-        //        res += string.Join(" ", hands[i][j]) + ", ";
-        //    }
-        //    res += "]";
-        //    Debug.Log($"{i + 1} {res}");
-        //}
         int diceIndex, placeIndex = 0;
         (diceIndex, placeIndex) = CalculateMove();
-        //int index = GetPlayableDiceComputer();
-        //Debug.Log($"INDEX {index}");
-        //DiceComputer(hands[currentIdTurn - 1][index]);
         DiceComputer(diceIndex, placeIndex);
         hands[currentIdTurn - 1][diceIndex] = GetDice();
         availableMoves.Clear();
-        // выбрать index в hands[currentTurnId]
-        // поставить его на рандомное место
-        // GetDice() в этот индекс
         NullSkippedPlayers();
         ChangeTurn();
     }
@@ -685,114 +543,17 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         VisualManager.Instance.Suits(place, hands[currentIdTurn - 1][diceIndex]);
         place.GetComponent<SingleplayerTile>().SynchronizeCodes();
         ConstructTilesAround(place.transform.position, place.GetComponent<SingleplayerTile>().GetState(), place.GetComponent<SingleplayerTile>().GetCode());
-
-
-        //Transform board = GameObject.FindGameObjectWithTag("Board").transform;
-        ////Debug.Log("playableDice");
-        //for (int j = 0; j < board.childCount; j++)
-        //{
-        //    //Debug.Log("Inside loop 2 " + j);
-        //    GameObject place = board.GetChild(j).gameObject;
-        //    if (!place.CompareTag("Place"))
-        //        continue;
-        //    //if (VisualManager.Instance.Suits(place.GetComponent<ITile>().GetCode(), code))
-        //    if (VisualManager.Instance.Suits(place, code))
-        //    {
-        //        //Dice(place.transform.position, code);
-        //        place.GetComponent<SingleplayerTile>().SynchronizeCodes();
-        //        ConstructTilesAround(place.transform.position, place.GetComponent<SingleplayerTile>().GetState(), place.GetComponent<SingleplayerTile>().GetCode());
-        //        return;
-        //    }
-        //}
     }
-
-    //private void DiceComputer(int[] code)
-    //{
-    //    Transform board = GameObject.FindGameObjectWithTag("Board").transform;
-    //    //Debug.Log("playableDice");
-    //    for (int j = 0; j < board.childCount; j++)
-    //    {
-    //        //Debug.Log("Inside loop 2 " + j);
-    //        GameObject place = board.GetChild(j).gameObject;
-    //        if (!place.CompareTag("Place"))
-    //            continue;
-    //        //if (VisualManager.Instance.Suits(place.GetComponent<ITile>().GetCode(), code))
-    //        if (VisualManager.Instance.Suits(place, code))
-    //        {
-    //            //Dice(place.transform.position, code);
-    //            place.GetComponent<SingleplayerTile>().SynchronizeCodes();
-    //            ConstructTilesAround(place.transform.position, place.GetComponent<SingleplayerTile>().GetState(), place.GetComponent<SingleplayerTile>().GetCode());
-    //            return;
-    //        }
-    //    }
-    //}
-
-    //private int GetPlayableDiceComputer()
-    //{
-    //    //Debug.Log($"GetPlayableDiceComputer");
-    //    //for (int i = 0; i < players - 1; i++)
-    //    //{
-    //    //    string res = "[";
-    //    //    for (int j = 0; j < 4; j++)
-    //    //    {
-    //    //        if (hands[i][j] == null) { res += "NULL, "; continue; }
-    //    //        res += string.Join(" ", hands[i][j]) + ", ";
-    //    //    }
-    //    //    res += "]";
-    //    //    Debug.Log($"{i + 1} {res}");
-    //    //}
-    //    int index = Random.Range(0, dices);
-    //    //int index = -1;
-    //    //Debug.Log($"{string.Join(" ", disabledComputerDices)}");
-    //    //for (int i = 0; i < 4; i++)
-    //    //{
-    //    //    if (hands[currentIdTurn - 1][i] != null && !disabledComputerDices.Contains(i))
-    //    //    {
-    //    //        index = i;
-    //    //        break;
-    //    //    }
-    //    //}
-    //    while (hands[currentIdTurn - 1][index] == null || disabledComputerDices.Contains(index))
-    //    {
-    //        index = Random.Range(0, dices);
-    //    }
-    //    return index;
-    //}
 
     private void ChangeTurn()
     {
         CurrentIdTurn = (CurrentIdTurn + 1) % players;
-        // on change turn
-        //OnTurnChanged();
     }
 
     private void OnTurnChanged(int obj)
     {
         HandleTurn();
         Scoreboard.Instance.UpdateTurn(currentIdTurn);
-        //int idTurn = currentIdTurn;
-
-        //if (players == skippedPlayers || currentIdTurn != idTurn)
-        //{
-        //    return;
-        //}
-        //for (int i = 0; i < players - 1; i++)
-        //{
-        //    string res = "[";
-        //    for (int j = 0; j < 4; j++)
-        //    {
-        //        if (hands[i][j] == null) { res += "NULL"; continue; }
-        //        res += string.Join(" ", hands[i][j]) + ", ";
-        //    }
-        //    res += "]";
-        //    Debug.Log($"{i + 1} {res}");
-        //}
-
-        //if (currentIdTurn != 0)
-        //{
-        //    disabledComputerDices.Clear();
-        //    MakeComputerMove();
-        //}
     }
 
     private void NullSkippedPlayers()
@@ -813,7 +574,6 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
                     break;
                 }
             }
-            //return true;
             if (result)
             {
                 return true;
@@ -826,10 +586,8 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     {
         Transform board = GameObject.FindGameObjectWithTag("Board").transform;
         bool playableDice = false;
-        //Debug.Log("playableDice");
         for (int j = 0; j < board.childCount; j++)
         {
-            //Debug.Log("Inside loop 2 " + j);
             GameObject place = board.GetChild(j).gameObject;
             if (!place.CompareTag("Place"))
                 continue;
@@ -862,15 +620,11 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
     public void SkipMove()
     {
-        //Debug.Log($"Skip Move {currentIdTurn}");
         skippedPlayers++;
         if (players == skippedPlayers)
         {
-            //EndGame();
-
             ShowWinner();
             GenerateGraph();
-            //Debug.Log("END");
             return;
         }
         ChangeTurn();

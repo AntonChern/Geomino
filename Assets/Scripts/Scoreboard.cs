@@ -1,6 +1,3 @@
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -75,7 +72,6 @@ public class Scoreboard : MonoBehaviour
 
     public void UpdateTurn(int index)
     {
-        //frame.transform.position = names[index].transform.position;
         frame.transform.position = new Vector3(frame.transform.position.x, names[index].transform.position.y, frame.transform.position.z);
     }
 

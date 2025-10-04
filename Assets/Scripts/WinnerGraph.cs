@@ -1,5 +1,4 @@
 using TMPro;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -83,27 +82,6 @@ public class WinnerGraph : MonoBehaviour
                 hidden = !hidden;
                 isSliding = false;
             }
-
-            //if (!hidden)
-            //{
-            //    animationTimer += Time.deltaTime;
-            //    transform.position = showPosition + (hidePosition - showPosition) * Mathf.Clamp(animationTimer / animationTime, 0f, 1f);
-            //    if (animationTimer >= animationTime)
-            //    {
-            //        animationTime = 0f;
-            //        hidden = !hidden;
-            //    }
-            //}
-            //else
-            //{
-            //    animationTimer += Time.deltaTime;
-            //    transform.position = hidePosition + (showPosition - hidePosition) * Mathf.Clamp(animationTimer / animationTime, 0f, 1f);
-            //    if (animationTimer >= animationTime)
-            //    {
-            //        animationTime = 0f;
-            //        hidden = !hidden;
-            //    }
-            //}
         }
 
         if (!playDrawAnimation) return;
@@ -112,7 +90,6 @@ public class WinnerGraph : MonoBehaviour
         paperFront.GetComponent<Image>().fillAmount = Mathf.Clamp(drawTimer / drawTime, 0f, 1f);
         if (drawTimer <= 0f)
         {
-            //animationTimer = animationTime;
             playDrawAnimation = false;
         }
     }
@@ -132,14 +109,11 @@ public class WinnerGraph : MonoBehaviour
 
     public void Draw()
     {
-        //Debug.Log("GenerateGraph");
         AudioManager.Instance.GraduallyStop("GameBackground");
         AudioManager.Instance.Play("Drawing");
 
         gameObject.SetActive(true);
         exitButton.gameObject.SetActive(true);
-
-        //winnerGraph.SetActive(true);
 
         float graphWidth = graphContainer.rect.width;
         float graphHeight = graphContainer.rect.height;
@@ -158,17 +132,11 @@ public class WinnerGraph : MonoBehaviour
                 float yPos = (history[i][j] / yMax) * graphHeight;
                 Vector2 currentPointPos = new Vector2(xPos - graphWidth / 2, yPos - graphHeight / 2);
 
-                // Draw line segment to previous point (if not the first point)
                 if (i > 0)
                 {
                     DrawLineSegment(lastPointPos, currentPointPos, j);
                 }
                 lastPointPos = currentPointPos;
-                // Create and position data point
-                //GameObject point = Instantiate(pointPrefab[j], graphContainer);
-                ////point.GetComponent<NetworkObject>().Spawn(true);
-                ////point.GetComponent<NetworkObject>().TrySetParent(graphContainer, false);
-                //point.GetComponent<RectTransform>().anchoredPosition = currentPointPos;
 
             }
 
@@ -177,19 +145,8 @@ public class WinnerGraph : MonoBehaviour
                 float xPos = i * xSpacing;
                 float yPos = (history[i][j] / yMax) * graphHeight;
                 Vector2 currentPointPos = new Vector2(xPos - graphWidth / 2, yPos - graphHeight / 2);
-
-                // Draw line segment to previous point (if not the first point)
-                //if (i > 0)
-                //{
-                //    DrawLineSegment(lastPointPos, currentPointPos, j);
-                //}
-                //lastPointPos = currentPointPos;
-                // Create and position data point
                 GameObject point = Instantiate(pointPrefab[j], graphContainer);
-                //point.GetComponent<NetworkObject>().Spawn(true);
-                //point.GetComponent<NetworkObject>().TrySetParent(graphContainer, false);
                 point.GetComponent<RectTransform>().anchoredPosition = currentPointPos;
-                //point.transform.localScale = Vector3.one * 0.5f;
 
             }
         }
@@ -200,15 +157,13 @@ public class WinnerGraph : MonoBehaviour
     void DrawLineSegment(Vector2 startPos, Vector2 endPos, int index)
     {
         GameObject lineSegment = Instantiate(lineSegmentPrefab[index], graphContainer);
-        //lineSegment.GetComponent<NetworkObject>().Spawn(true);
-        //lineSegment.GetComponent<NetworkObject>().TrySetParent(graphContainer, false);
         RectTransform lineRect = lineSegment.GetComponent<RectTransform>();
 
         Vector2 direction = (endPos - startPos).normalized;
         float distance = Vector2.Distance(startPos, endPos);
 
         lineRect.anchoredPosition = startPos + direction * (distance / 2f);
-        lineRect.sizeDelta = new Vector2(distance, lineRect.sizeDelta.y * 0.8f); // Adjust line thickness if needed
+        lineRect.sizeDelta = new Vector2(distance, lineRect.sizeDelta.y * 0.8f);
         lineRect.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
     }
 

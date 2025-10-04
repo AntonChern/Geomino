@@ -14,47 +14,42 @@ public class VideoLoop : MonoBehaviour
             if (videoPlayer == null)
             {
                 Debug.LogError("VideoPlayer component not found!");
-                enabled = false; // Disable script if no VideoPlayer
+                enabled = false;
                 return;
             }
         }
 
-        videoPlayer.Prepare(); // Prepare the video for playback
-        videoPlayer.loopPointReached += OnVideoEnd; // Subscribe to end event
+        videoPlayer.Prepare();
+        videoPlayer.loopPointReached += OnVideoEnd;
     }
 
     void Update()
     {
         if (videoPlayer.isPrepared && !videoPlayer.isPlaying)
         {
-            videoPlayer.Play(); // Start playing once prepared
+            videoPlayer.Play();
         }
 
-        if (!playingForward) // If playing in reverse
+        if (!playingForward)
         {
-            // Manually decrement the frame or time for reverse playback
-            // Using frame is generally smoother for reverse playback than time
             if (videoPlayer.frame > 0)
             {
                 videoPlayer.frame--;
             }
             else
             {
-                // Reached the beginning, switch to forward
                 playingForward = true;
-                videoPlayer.Play(); // Start playing forward
+                videoPlayer.Play();
             }
         }
     }
 
     void OnVideoEnd(VideoPlayer vp)
     {
-        // This event fires when the video reaches its end (in forward playback)
         if (playingForward)
         {
             playingForward = false;
             videoPlayer.Stop();
-            // No need to explicitly Play() here, Update() will handle reverse
         }
     }
 
@@ -62,7 +57,7 @@ public class VideoLoop : MonoBehaviour
     {
         if (videoPlayer != null)
         {
-            videoPlayer.loopPointReached -= OnVideoEnd; // Unsubscribe to prevent memory leaks
+            videoPlayer.loopPointReached -= OnVideoEnd;
         }
     }
 }
