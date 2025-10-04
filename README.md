@@ -8,6 +8,7 @@ Players are each given 4 triangular chips, with the sides numbered with digits f
 ## Moves
 * The player's task is to choose one of their 4 chips and place it next to the chips already laid out on the field so that it touches them with at least one side, and the touching sides must have the same number.
 * If the chip is docked to one side, the player receives as many points as there were on the docking side. If the chip is docked to two sides at once, the player receives a total number of points for two sides. And similarly for the three sides.
+* After placing a chip, the player receives another random chip from the bag. If there are no chips left in the bag, the player does not receive anything.
 * Not all chips can be placed during a player's turn. Such chips are marked in grey and are inactive for the game. If all chips are inactive during a player's turn, the player skips their turn.
 * If a player has no chips left to play, they also skip their turn.
 * The game ends when all players have skipped their turn.
