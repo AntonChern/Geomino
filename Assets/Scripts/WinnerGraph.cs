@@ -69,7 +69,7 @@ public class WinnerGraph : MonoBehaviour
         isSliding = true;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (isSliding)
         {

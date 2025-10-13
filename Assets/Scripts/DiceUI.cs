@@ -51,7 +51,7 @@ public class DiceUI : MonoBehaviour
         Disable();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (playNewDiceAnimation)
         {

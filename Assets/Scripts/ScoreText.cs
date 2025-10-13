@@ -13,7 +13,7 @@ public class ScoreText : MonoBehaviour
         initialPos = transform.position;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         elapsedTime += Time.deltaTime;
         transform.position = new Vector3(initialPos.x, initialPos.y + distance * elapsedTime / animationTime, initialPos.z);

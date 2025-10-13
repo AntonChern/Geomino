@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      biegeButton_0: -6482752976994699492
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
