@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class MapManager : MonoBehaviour
 {
@@ -6,6 +7,7 @@ public class MapManager : MonoBehaviour
     private IMap map;
 
     [SerializeField] private GameObject background;
+    private MapScaler backgroundScaler;
     private Vector2 backgroundOffset;
 
     private void Awake()
@@ -15,6 +17,7 @@ public class MapManager : MonoBehaviour
 
     private void Start()
     {
+        backgroundScaler = background.GetComponent<MapScaler>();
         backgroundOffset = background.GetComponent<Renderer>().material.mainTextureOffset;
 
         for (int i = 0; i < transform.childCount; i++)
@@ -34,9 +37,11 @@ public class MapManager : MonoBehaviour
 
     public void DragBackground(Vector3 offset)
     {
-        backgroundOffset -= new Vector2(offset.x / background.transform.localScale.x, offset.y / background.transform.localScale.y);
-        background.GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
-        
+        backgroundScaler.SetDragTextureOffset(offset);
+        //backgroundOffset -= new Vector2(offset.x, offset.y * 15f / 26f);
+        //backgroundRenderer.material.mainTextureOffset = backgroundOffset;
+        background.transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, background.transform.position.z);
+
         map.DragMap(offset);
     }
 }

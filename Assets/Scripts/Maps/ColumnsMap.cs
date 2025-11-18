@@ -5,8 +5,8 @@ public class ColumnsMap : MonoBehaviour, IMap
 {
     [SerializeField] private GameObject placesPrefab;
     private GameObject places;
+    private MapScaler scaler;
 
-    private Vector2 backgroundOffset;
     private float cameraOffset;
 
     private void Awake()
@@ -19,8 +19,7 @@ public class ColumnsMap : MonoBehaviour, IMap
             return;
         }
         places = Instantiate(placesPrefab, gameObject.transform);
-
-        backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
+        scaler = places.GetComponent<MapScaler>();
         cameraOffset = places.transform.position.y - Camera.main.transform.position.y;
     }
 
@@ -38,8 +37,7 @@ public class ColumnsMap : MonoBehaviour, IMap
 
     public void DragMap(Vector2 offset)
     {
-        backgroundOffset -= new Vector2(offset.x / places.transform.localScale.x, offset.y / places.transform.localScale.y);
-        places.GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
+        scaler.SetDragTextureOffset(offset);
         PositionUpdate();
     }
 }

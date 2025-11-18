@@ -45,7 +45,7 @@ public class DiceUI : MonoBehaviour
                 AudioManager.Instance.Play("DicePickUp");
             }
         });
-        startButtonPosition = transform.position;
+        startButtonPosition = transform.localPosition;
         newDiceAnimationTime = newDiceAnimationTimer;
 
         Disable();
@@ -56,7 +56,7 @@ public class DiceUI : MonoBehaviour
         if (playNewDiceAnimation)
         {
             newDiceAnimationTimer -= Time.deltaTime;
-            gameObject.transform.position = startButtonPosition + Vector2.down * (newDiceDistance * Mathf.Clamp(newDiceAnimationTimer / newDiceAnimationTime, 0f, 1f));
+            gameObject.transform.localPosition = startButtonPosition + Vector2.down * (newDiceDistance * Mathf.Clamp(newDiceAnimationTimer / newDiceAnimationTime, 0f, 1f));
             if (newDiceAnimationTimer <= 0f)
             {
                 newDiceAnimationTimer = newDiceAnimationTime;

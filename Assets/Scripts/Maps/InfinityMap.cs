@@ -6,7 +6,7 @@ public class InfinityMap : MonoBehaviour, IMap
     [SerializeField] private GameObject placesPrefab;
 
     private GameObject places;
-    private Vector2 backgroundOffset;
+    private MapScaler scaler;
 
     private void Awake()
     {
@@ -19,7 +19,7 @@ public class InfinityMap : MonoBehaviour, IMap
             return;
         }
         places = Instantiate(placesPrefab, gameObject.transform);
-        backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
+        scaler = places.GetComponent<MapScaler>();
     }
 
     private void PositionUpdate()
@@ -34,8 +34,7 @@ public class InfinityMap : MonoBehaviour, IMap
 
     public void DragMap(Vector2 offset)
     {
-        backgroundOffset -= new Vector2(offset.x / places.transform.localScale.x, offset.y / places.transform.localScale.y);
-        places.GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
+        scaler.SetDragTextureOffset(offset);
         PositionUpdate();
     }
 }

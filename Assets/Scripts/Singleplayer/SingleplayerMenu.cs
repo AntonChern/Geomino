@@ -7,6 +7,8 @@ public class SingleplayerMenu : MonoBehaviour
 {
     public static SingleplayerMenu Instance { get; private set; }
 
+    [SerializeField] private GameObject table;
+
     [SerializeField] private Button startGameButton;
     [SerializeField] private Button cancelButton;
     [SerializeField] private TMP_InputField playerName;
@@ -67,12 +69,14 @@ public class SingleplayerMenu : MonoBehaviour
     public void Show()
     {
         gameObject.SetActive(true);
+        table.SetActive(true);
         if (PlayerPrefs.GetString("playerName") != string.Empty) 
             playerName.text = PlayerPrefs.GetString("playerName");
     }
 
     public void Hide()
     {
+        table.SetActive(false);
         gameObject.SetActive(false);
     }
 }

@@ -6,7 +6,8 @@ public class HallwayMap : MonoBehaviour, IMap
     [SerializeField] private GameObject placesPrefab;
     private GameObject places;
 
-    private Vector2 backgroundOffset;
+    //private Vector2 backgroundOffset;
+    private MapScaler scaler;
 
     private float radius = 2.5f * Mathf.Sqrt(3) / 2;
 
@@ -20,8 +21,8 @@ public class HallwayMap : MonoBehaviour, IMap
             return;
         }
         places = Instantiate(placesPrefab, gameObject.transform);
-
-        backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
+        scaler = places.GetComponent<MapScaler>();
+        //backgroundOffset = places.GetComponent<Renderer>().material.mainTextureOffset;
     }
 
     private void PositionUpdate()
@@ -36,8 +37,9 @@ public class HallwayMap : MonoBehaviour, IMap
 
     public void DragMap(Vector2 offset)
     {
-        backgroundOffset -= new Vector2(offset.x / places.transform.localScale.x, 0f);
-        places.GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
+        //backgroundOffset -= new Vector2(offset.x / places.transform.localScale.x, 0f);
+        //places.GetComponent<Renderer>().material.mainTextureOffset = backgroundOffset;
+        scaler.SetDragTextureOffset(new Vector2(offset.x, 0f));
         PositionUpdate();
     }
 }
