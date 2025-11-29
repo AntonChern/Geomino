@@ -212,7 +212,13 @@ public class VisualManager : MonoBehaviour
 
     IEnumerator moveWaiter()
     {
-        yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+        float timer = 0f;
+        float waitingTime = Random.Range(0.5f, 1f);
+        while (timer < waitingTime)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
         GameHandler.Instance.MakeComputerMove();
     }
 

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class RoomPlayer : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI playerName;
+    [SerializeField] private TextMeshProUGUI starCounter;
     [SerializeField] private Button kickButton;
 
     private IReadOnlyPlayer player;
@@ -29,6 +30,7 @@ public class RoomPlayer : MonoBehaviour
     {
         this.player = player;
 
-        playerName.text = $"{player.Properties["playerName"].Value}";
+        playerName.text = $"{player.Properties[RoomManager.playerNamePropertyKey].Value}";
+        starCounter.text = $"{player.Properties[RoomManager.starCounterPropertyKey].Value}";
     }
 }

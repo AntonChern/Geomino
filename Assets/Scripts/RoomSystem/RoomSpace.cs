@@ -14,8 +14,10 @@ public class RoomSpace : MonoBehaviour
     [SerializeField] private Button leaveGameButton;
     [SerializeField] private GameObject[] tiles;
     [SerializeField] private TMP_InputField[] nameFields;
+    [SerializeField] private TextMeshProUGUI[] starCounters;
 
     [SerializeField] private TMP_InputField oldNameField;
+    [SerializeField] private GameObject oldStars;
 
     [SerializeField] private TMP_Dropdown map;
     [SerializeField] private GameObject mapName;
@@ -223,6 +225,7 @@ public class RoomSpace : MonoBehaviour
     {
         gameObject.SetActive(true);
         oldNameField.gameObject.SetActive(false);
+        oldStars.SetActive(false);
     }
 
     private void HideTiles()
@@ -243,6 +246,7 @@ public class RoomSpace : MonoBehaviour
         mapName.SetActive(false);
         oldNameField.text = RoomManager.Instance.PlayerName;
         oldNameField.gameObject.SetActive(true);
+        oldStars.SetActive(true);
 
         roomName.text = string.Empty;
         currentIndex = -1;

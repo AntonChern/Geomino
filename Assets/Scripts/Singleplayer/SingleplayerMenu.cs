@@ -14,6 +14,8 @@ public class SingleplayerMenu : MonoBehaviour
     [SerializeField] private TMP_InputField playerName;
     [SerializeField] private TMP_Dropdown map;
 
+    [SerializeField] private TextMeshProUGUI starsCounter;
+
     [SerializeField] private GameObject[] players;
 
     private void Awake()
@@ -58,6 +60,8 @@ public class SingleplayerMenu : MonoBehaviour
             PlayerPrefs.SetString("map", MapHandler.TranslateToEnglish(map.options[value].text));
             PlayerPrefs.Save();
         });
+
+        starsCounter.text = PlayerPrefs.GetInt("stars").ToString();
 
         PlayerPrefs.SetString("map", "infinity");
         PlayerPrefs.SetInt("players", 2);

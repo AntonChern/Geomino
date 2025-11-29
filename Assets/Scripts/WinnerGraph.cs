@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,7 @@ public class WinnerGraph : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] names;
     [SerializeField] private TextMeshProUGUI[] scores;
     [SerializeField] private Image[] crowns;
+    [SerializeField] private Image[] starIcons;
     [SerializeField] private Image paperFront;
     [SerializeField] private Button exitButton;
     [SerializeField] private Button slideButton;
@@ -169,6 +171,7 @@ public class WinnerGraph : MonoBehaviour
 
     public void ShowScoreboard()
     {
+        List<int> stars = GameHandler.Instance.gameManager.GetStars();
         for (int i = 0; i < GameHandler.Instance.gameManager.GetScores().Count; i++)
         {
             names[i].gameObject.SetActive(true);
@@ -177,8 +180,17 @@ public class WinnerGraph : MonoBehaviour
             {
                 crowns[i].gameObject.SetActive(true);
             }
+            ShowStars(i, stars[i]);
             names[i].text = Scoreboard.Instance.GetPlayer(i);
             scores[i].text = Scoreboard.Instance.GetPlayerScore(i);
+        }
+    }
+
+    private void ShowStars(int index, int stars)
+    {
+        for (int i = 0; i < stars; i++)
+        {
+            starIcons[index * 3 + i].gameObject.SetActive(true);
         }
     }
 }

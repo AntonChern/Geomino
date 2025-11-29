@@ -11,5 +11,6 @@ public interface IGameManager
     public void SkipMove();
     public List<int[]> GetHistory();
     public List<int> GetWinners();
+    public List<int> GetStars();
     public void Exit();
 }

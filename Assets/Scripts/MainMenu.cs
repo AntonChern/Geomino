@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,6 +10,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Button singleplayerButton;
     [SerializeField] private Button multiplayerButton;
     [SerializeField] private Button audioButton;
+
+    [SerializeField] private TextMeshProUGUI starsCounter;
 
     private void Awake()
     {
@@ -31,6 +34,8 @@ public class MainMenu : MonoBehaviour
             AudioMenu.Instance.Show();
             Hide();
         });
+
+        starsCounter.text = PlayerPrefs.GetInt("stars").ToString();
 
         if (RoomManager.Instance != null)
         {

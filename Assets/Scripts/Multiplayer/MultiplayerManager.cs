@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEngine.Rendering.DebugUI;
 
 public class MultiplayerManager : NetworkBehaviour, IGameManager
 {
@@ -16,6 +17,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     public NetworkVariable<int> currentIdTurn = new NetworkVariable<int>(0);
     public NetworkList<int> scores = new NetworkList<int>();
     public NetworkList<int> winners = new NetworkList<int>();
+    private List<int> stars = null;
 
     private List<int[]> bag;
     private List<int[]> history = new List<int[]>();
@@ -449,7 +451,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     private void GenerateBag()
     {
         int colors = 7;
-        //int maxNumber = 8;
+        //int maxNumber = 16;
         bag = new List<int[]>();
         for (int i = 0; i < colors; i++)
         {
@@ -619,6 +621,17 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     [Rpc(SendTo.ClientsAndHost)]
     private void EndGameRpc()
     {
+        List<int> stars = GetStars();
+        for (int i = 0; i < stars.Count; i++)
+        {
+            if (clientIndex[NetworkManager.Singleton.LocalClientId] == i)
+            {
+                int newStars = PlayerPrefs.GetInt("stars") + stars[i];
+                PlayerPrefs.SetInt("stars", newStars);
+                PlayerPrefs.Save();
+                RoomManager.Instance.UpdateStarCounter(newStars.ToString());
+            }
+        }
         VisualManager.Instance.HidePlaces();
     }
 
@@ -640,5 +653,33 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     public void Exit()
     {
         RoomManager.Instance.LeaveSession();
+    }
+
+    private int CountStarsFor(int index)
+    {
+        int result = 0;
+        for (int i = 0; i < scores.Count; i++)
+        {
+            if (scores[i] < scores[index])
+            {
+                result++;
+            }
+        }
+        return result;
+    }
+
+    public List<int> GetStars()
+    {
+        if (stars != null) return stars;
+        stars = new List<int>();
+        for (int i = 0; i < scores.Count; i++)
+        {
+            stars.Add(0);
+        }
+        for (int i = 0; i < stars.Count; i++)
+        {
+            stars[i] = CountStarsFor(i);
+        }
+        return stars;
     }
 }

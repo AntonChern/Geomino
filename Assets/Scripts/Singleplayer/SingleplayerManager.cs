@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -28,6 +29,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     }
     public List<int> scores = new List<int>();
     public List<int> winners = new List<int>();
+    private List<int> stars = null;
 
     private List<int[]> bag;
     private List<int[]> history = new List<int[]>();
@@ -298,7 +300,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     private void GenerateBag()
     {
         int colors = 7;
-        //int maxNumber = 8;
+        int maxNumber = 16;
         bag = new List<int[]>();
         for (int i = 0; i < colors; i++)
         {
@@ -308,10 +310,10 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
                 {
                     bag.Add(new int[3] { i, j, k });
                     bag.Add(new int[3] { i, k, j });
-                    //if (bag.Count >= maxNumber)
-                    //{
-                    //    return;
-                    //}
+                    if (bag.Count >= maxNumber)
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -623,11 +625,20 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
         skippedPlayers++;
         if (players == skippedPlayers)
         {
-            ShowWinner();
-            GenerateGraph();
+            FinishGame();
             return;
         }
         ChangeTurn();
+    }
+
+    private void FinishGame()
+    {
+        List<int> stars = GetStars();
+        PlayerPrefs.SetInt("stars", PlayerPrefs.GetInt("stars") + stars[0]);
+        PlayerPrefs.Save();
+
+        ShowWinner();
+        GenerateGraph();
     }
 
     private void ShowWinner()
@@ -654,5 +665,21 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     public void Exit()
     {
         SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+    }
+
+    public List<int> GetStars()
+    {
+        if (stars != null) return stars;
+        stars = new List<int>();
+        for (int i = 0; i < scores.Count; i++)
+        {
+            stars.Add(0);
+            if (i == 0) continue;
+            if (scores[i] < scores[0] && difficulties[i - 1] == Difficulty.Impossible)
+            {
+                stars[0]++;
+            }
+        }
+        return stars;
     }
 }

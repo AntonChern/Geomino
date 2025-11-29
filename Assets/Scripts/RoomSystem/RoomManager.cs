@@ -38,6 +38,7 @@ public class RoomManager : MonoBehaviour
     string sessionName = "MyRoom";
 
     public const string playerNamePropertyKey = "playerName";
+    public const string starCounterPropertyKey = "starCounter";
     public const string mapProperty = "map";
 
     private void Awake()
@@ -117,6 +118,14 @@ public class RoomManager : MonoBehaviour
         ActiveSession.SaveCurrentPlayerDataAsync();
     }
 
+    public void UpdateStarCounter(string newStarCounter)
+    {
+        if (ActiveSession == null) return;
+        var starCounterProperty = new PlayerProperty(newStarCounter, VisibilityPropertyOptions.Member);
+        ActiveSession.CurrentPlayer.SetProperty(starCounterPropertyKey, starCounterProperty);
+        ActiveSession.SaveCurrentPlayerDataAsync();
+    }
+
     public async void CreateSession()
     {
         var options = new SessionOptions()
@@ -139,9 +148,11 @@ public class RoomManager : MonoBehaviour
     Dictionary<string, PlayerProperty> GetPlayerProperties()
     {
         var playerNameProperty = new PlayerProperty(playerName, VisibilityPropertyOptions.Member);
+        var starCounterProperty = new PlayerProperty(PlayerPrefs.GetInt("stars").ToString(), VisibilityPropertyOptions.Member);
         return new Dictionary<string, PlayerProperty>
         {
             { playerNamePropertyKey, playerNameProperty },
+            { starCounterPropertyKey, starCounterProperty },
         };
     }
 

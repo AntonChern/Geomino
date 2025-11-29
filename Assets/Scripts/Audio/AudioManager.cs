@@ -152,14 +152,6 @@ public class AudioManager : MonoBehaviour
             s.source.volume = maxVolume * Mathf.Clamp(stopTime - timer, 0f, stopTime) / stopTime;
             yield return null;
         }
-
-        //int n = 1000;
-        //float step = 4f / n;
-        //for (int i = n; i >= 0; i--)
-        //{
-        //    s.source.volume = Mathf.Clamp01(s.source.volume - maxVolume / n);
-        //    yield return new WaitForSeconds(step);
-        //}
         Stop(s.name);
         Debug.Log("Stopped");
         s.source.volume = maxVolume;
