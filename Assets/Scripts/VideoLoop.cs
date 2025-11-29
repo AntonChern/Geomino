@@ -19,6 +19,8 @@ public class VideoLoop : MonoBehaviour
             }
         }
 
+        videoPlayer.url = System.IO.Path.Combine(Application.streamingAssetsPath, "screensaver.mp4");
+
         videoPlayer.Prepare();
         videoPlayer.loopPointReached += OnVideoEnd;
     }

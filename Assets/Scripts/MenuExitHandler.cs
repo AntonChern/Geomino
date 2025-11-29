@@ -25,8 +25,8 @@ public class MenuExitHandler : MonoBehaviour
                 MainMenu.Instance.Show();
                 return;
             }
-            MainMenu.Instance.gameObject.SetActive(exitMessage.activeInHierarchy);
-            exitMessage.SetActive(!exitMessage.activeInHierarchy);
+            //MainMenu.Instance.gameObject.SetActive(exitMessage.activeInHierarchy);
+            //exitMessage.SetActive(!exitMessage.activeInHierarchy);
         }
     }
 }

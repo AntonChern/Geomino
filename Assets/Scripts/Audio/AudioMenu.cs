@@ -41,7 +41,6 @@ public class AudioMenu : MonoBehaviour
             PlayerPrefs.SetFloat("soundSilencer", 1f - value);
             PlayerPrefs.Save();
             AudioManager.Instance.UpdateVolumes(Audio.Sound, soundMultiplier);
-            AudioManager.Instance.Play("Dice");
         });
         mainMenuButton.onClick.AddListener(() =>
         {

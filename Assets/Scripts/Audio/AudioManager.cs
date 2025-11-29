@@ -12,6 +12,8 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance;
 
     private Coroutine stopGameBackground;
+    private float stopTime = 4f;
+
     void Awake()
     {
         if (Instance == null)
@@ -143,13 +145,21 @@ public class AudioManager : MonoBehaviour
     IEnumerator StopAudioWaiter(Sound s)
     {
         float maxVolume = s.source.volume;
-        int n = 1000;
-        float step = 4f / n;
-        for (int i = n; i >= 0; i--)
+        float timer = 0f;
+        while (timer < stopTime)
         {
-            s.source.volume = Mathf.Clamp01(s.source.volume - maxVolume / n);
-            yield return new WaitForSeconds(step);
+            timer += Time.deltaTime;
+            s.source.volume = maxVolume * Mathf.Clamp(stopTime - timer, 0f, stopTime) / stopTime;
+            yield return null;
         }
+
+        //int n = 1000;
+        //float step = 4f / n;
+        //for (int i = n; i >= 0; i--)
+        //{
+        //    s.source.volume = Mathf.Clamp01(s.source.volume - maxVolume / n);
+        //    yield return new WaitForSeconds(step);
+        //}
         Stop(s.name);
         Debug.Log("Stopped");
         s.source.volume = maxVolume;
