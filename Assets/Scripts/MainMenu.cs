@@ -2,6 +2,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using YG;
+using PlayerPrefs = RedefineYG.PlayerPrefs;
 
 public class MainMenu : MonoBehaviour
 {
@@ -10,6 +12,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Button singleplayerButton;
     [SerializeField] private Button multiplayerButton;
     [SerializeField] private Button audioButton;
+    [SerializeField] private Button leaderboardButton;
 
     [SerializeField] private TextMeshProUGUI starsCounter;
 
@@ -34,8 +37,15 @@ public class MainMenu : MonoBehaviour
             AudioMenu.Instance.Show();
             Hide();
         });
+        leaderboardButton.onClick.AddListener(() =>
+        {
+            LeaderboardController.Instance.Show();
+            Hide();
+        });
 
-        starsCounter.text = PlayerPrefs.GetInt("stars").ToString();
+        int stars = PlayerPrefs.GetInt("stars");
+        starsCounter.text = stars.ToString();
+        YG2.SetLeaderboard("starsLeaderboard", stars);
 
         if (RoomManager.Instance != null)
         {

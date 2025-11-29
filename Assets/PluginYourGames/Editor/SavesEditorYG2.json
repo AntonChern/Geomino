@@ -1,0 +1,35 @@
+{
+    "stringKeys": [
+        "map",
+        "playerName"
+    ],
+    "stringValues": [
+        "infinity",
+        "Name"
+    ],
+    "floatKeys": [],
+    "floatValues": [],
+    "intKeys": [
+        "players",
+        "difficulty0",
+        "difficulty1",
+        "difficulty2",
+        "stars"
+    ],
+    "intValues": [
+        2,
+        1,
+        1,
+        1,
+        0
+    ],
+    "intExample": 5,
+    "strExample": "Hello!",
+    "boolExample": [
+        false,
+        false,
+        false,
+        false
+    ],
+    "idSave": 156
+}

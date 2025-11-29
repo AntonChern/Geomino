@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using PlayerPrefs = RedefineYG.PlayerPrefs;
 
 public class StarsController : MonoBehaviour
 {

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -23,19 +24,14 @@ public class WinnerGraph : MonoBehaviour
     private float drawTimer;
     private float drawTime = 2f;
 
-    private Vector2 showPosition;
-    private Vector2 hidePosition;
     private bool hidden = false;
-    private bool isSliding = false;
-    private float slideTimer;
     private float slideTime = 0.25f;
+
+    private RectTransform rectTransform;
 
     private void Awake()
     {
         Instance = this;
-
-        showPosition = transform.position;
-        hidePosition = (Vector2)transform.position + Vector2.up * 800f;
     }
 
     private void Start()
@@ -51,6 +47,8 @@ public class WinnerGraph : MonoBehaviour
             SlideGraph();
         });
 
+        rectTransform = GetComponent<RectTransform>();
+
         drawTimer = drawTime;
         gameObject.SetActive(false);
     }
@@ -63,29 +61,39 @@ public class WinnerGraph : MonoBehaviour
 
     public void SetExitButtonText(string value)
     {
-        exitButton.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = value;
+        foreach (Transform child in exitButton.transform)
+        {
+            var textMeshPro = child.GetComponent<TextMeshProUGUI>();
+            if (textMeshPro == null) continue;
+            textMeshPro.text = value;
+        }
     }
 
     private void SlideGraph()
     {
-        isSliding = true;
+        hidden = !hidden;
+        if (hidden)
+        {
+            Vector3 position = rectTransform.position;
+            rectTransform.anchorMin = new Vector2(0.5f, 1f);
+            rectTransform.anchorMax = new Vector2(0.5f, 1f);
+            rectTransform.position = position;
+            rectTransform.DOAnchorPosY(260f, slideTime);
+            slideButton.transform.DORotate(new Vector3(0f, 0f, 180f), slideTime);
+        }
+        else
+        {
+            Vector3 position = rectTransform.position;
+            rectTransform.anchorMin = Vector2.one / 2f;
+            rectTransform.anchorMax = Vector2.one / 2f;
+            rectTransform.position = position;
+            rectTransform.DOAnchorPosY(0f, slideTime);
+            slideButton.transform.DORotate(new Vector3(0f, 0f, 0f), slideTime);
+        }
     }
 
     private void Update()
     {
-        if (isSliding)
-        {
-            slideTimer += Time.deltaTime;
-            transform.position = (hidden ? hidePosition : showPosition) + (hidden ? 1 : -1) * (showPosition - hidePosition) * Mathf.Clamp(slideTimer / slideTime, 0f, 1f);
-            slideButton.transform.rotation = Quaternion.Euler(0f, 0f, (hidden ? 180f : 0f) + 180f * Mathf.Clamp(slideTimer / slideTime, 0f, 1f));
-            if (slideTimer >= slideTime)
-            {
-                slideTimer = 0f;
-                hidden = !hidden;
-                isSliding = false;
-            }
-        }
-
         if (!playDrawAnimation) return;
 
         drawTimer -= Time.deltaTime;

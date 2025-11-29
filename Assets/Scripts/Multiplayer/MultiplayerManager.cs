@@ -4,7 +4,8 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static UnityEngine.Rendering.DebugUI;
+using YG;
+using PlayerPrefs = RedefineYG.PlayerPrefs;
 
 public class MultiplayerManager : NetworkBehaviour, IGameManager
 {
@@ -188,11 +189,15 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
 
         IEnumerator quitWaiter()
         {
-            for (int i = 5; i > 0; i--)
+            float returningTime = 5f;
+            float timer = returningTime;
+            while (timer > 0f)
             {
-                WinnerGraph.Instance.SetExitButtonText($"Возвращение в комнату через {i}");
-                yield return new WaitForSeconds(1);
+                timer = Mathf.Clamp(timer - Time.deltaTime, 0f, returningTime);
+                WinnerGraph.Instance.SetExitButtonText($"Возвращение в комнату через {Mathf.Ceil(timer)}");
+                yield return null;
             }
+            YG2.InterstitialAdvShow();
             if (NetworkManager.Singleton.IsHost)
             {
                 QuitGame();
@@ -451,7 +456,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     private void GenerateBag()
     {
         int colors = 7;
-        //int maxNumber = 16;
+        //int maxNumber = 8;
         bag = new List<int[]>();
         for (int i = 0; i < colors; i++)
         {
@@ -629,6 +634,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
                 int newStars = PlayerPrefs.GetInt("stars") + stars[i];
                 PlayerPrefs.SetInt("stars", newStars);
                 PlayerPrefs.Save();
+                YG2.SetLeaderboard("starsLeaderboard", newStars);
                 RoomManager.Instance.UpdateStarCounter(newStars.ToString());
             }
         }

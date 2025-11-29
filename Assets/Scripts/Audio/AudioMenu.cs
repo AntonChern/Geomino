@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using PlayerPrefs = RedefineYG.PlayerPrefs;
 
 public class AudioMenu : MonoBehaviour
 {
@@ -32,14 +33,12 @@ public class AudioMenu : MonoBehaviour
         {
             musicMultiplier = value;
             PlayerPrefs.SetFloat("musicSilencer", 1f - value);
-            PlayerPrefs.Save();
             AudioManager.Instance.UpdateVolumes(Audio.Music, musicMultiplier);
         });
         soundSlider.onValueChanged.AddListener((float value) =>
         {
             soundMultiplier = value;
             PlayerPrefs.SetFloat("soundSilencer", 1f - value);
-            PlayerPrefs.Save();
             AudioManager.Instance.UpdateVolumes(Audio.Sound, soundMultiplier);
         });
         mainMenuButton.onClick.AddListener(() =>
@@ -53,6 +52,7 @@ public class AudioMenu : MonoBehaviour
 
     public void Hide()
     {
+        PlayerPrefs.Save();
         gameObject.SetActive(false);
     }
 

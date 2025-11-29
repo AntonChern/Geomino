@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using YG;
+using PlayerPrefs = RedefineYG.PlayerPrefs;
 
 public class SingleplayerManager : MonoBehaviour, IGameManager
 {
@@ -300,7 +301,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     private void GenerateBag()
     {
         int colors = 7;
-        int maxNumber = 16;
+        //int maxNumber = 8;
         bag = new List<int[]>();
         for (int i = 0; i < colors; i++)
         {
@@ -310,10 +311,10 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
                 {
                     bag.Add(new int[3] { i, j, k });
                     bag.Add(new int[3] { i, k, j });
-                    if (bag.Count >= maxNumber)
-                    {
-                        return;
-                    }
+                    //if (bag.Count >= maxNumber)
+                    //{
+                    //    return;
+                    //}
                 }
             }
         }
@@ -617,6 +618,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
     public void EndGame()
     {
+        YG2.InterstitialAdvShow();
         SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
@@ -634,8 +636,10 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     private void FinishGame()
     {
         List<int> stars = GetStars();
-        PlayerPrefs.SetInt("stars", PlayerPrefs.GetInt("stars") + stars[0]);
+        int newStars = PlayerPrefs.GetInt("stars") + stars[0];
+        PlayerPrefs.SetInt("stars", newStars);
         PlayerPrefs.Save();
+        YG2.SetLeaderboard("starsLeaderboard", newStars);
 
         ShowWinner();
         GenerateGraph();

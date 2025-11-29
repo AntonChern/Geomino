@@ -6,6 +6,8 @@ using Unity.Services.Core;
 using Unity.Services.Multiplayer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using YG;
+using PlayerPrefs = RedefineYG.PlayerPrefs;
 
 public class RoomManager : MonoBehaviour
 {
@@ -51,6 +53,10 @@ public class RoomManager : MonoBehaviour
         Instance = this;
 
         string existingPlayerName = PlayerPrefs.GetString(playerNamePropertyKey);
+        //if (YG2.player.auth)
+        //{
+        //    existingPlayerName = YG2.player.name;
+        //}
         if (existingPlayerName != "")
             playerName = existingPlayerName;
     }
