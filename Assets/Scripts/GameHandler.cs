@@ -1,3 +1,4 @@
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ public class GameHandler : MonoBehaviour
     [SerializeField] private GameObject singleplayerPrefab;
 
     [SerializeField] private GameObject exitMessage;
+    [SerializeField] public TextMeshProUGUI countdown;
 
     public IGameManager gameManager;
 
@@ -30,6 +32,7 @@ public class GameHandler : MonoBehaviour
                 var multiplayerManager = Instantiate(multiplayerPrefab);
                 multiplayerManager.GetComponent<NetworkObject>().Spawn(true);
                 gameManager = multiplayerManager.GetComponent<MultiplayerManager>();
+                gameManager.SetCountdown();
             }
         }
     }

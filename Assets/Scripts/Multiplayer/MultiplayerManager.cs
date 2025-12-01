@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YG;
@@ -10,6 +12,16 @@ using PlayerPrefs = RedefineYG.PlayerPrefs;
 public class MultiplayerManager : NetworkBehaviour, IGameManager
 {
     public static MultiplayerManager Instance;
+
+    private float moveTime = 60f;
+    private Color myCountdown = Color.white;
+    private Color myCountdownWarning = new Color(0.78125f, 0f, 0f, 1f);
+    private Color otherCountdown = Color.gray;
+    private Color otherCountdownWarning = new Color(0.390625f, 0f, 0f, 1f);
+    private TextMeshProUGUI countdown;
+    private Coroutine countdownCoroutine;
+    private int afkMoves = 0;
+    private int afkLimit = 3;
 
     private int faces = 3;
     private int skippedPlayers = 0;
@@ -80,7 +92,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
 
         currentIdTurn.OnValueChanged += (int oldValue, int newValue) =>
         {
-            HandleTurn();
+            HandleTurn(true);
             Scoreboard.Instance.UpdateTurn(newValue);
         };
 
@@ -127,7 +139,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         }
         else
         {
-            HandleTurnRpc();
+            HandleTurnRpc(currentIdTurn.Value == index);
         }
         scores.RemoveAt(index);
         hands.RemoveAt(index);
@@ -143,9 +155,9 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void HandleTurnRpc()
+    private void HandleTurnRpc(bool updateCountdown)
     {
-        HandleTurn();
+        HandleTurn(updateCountdown);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -285,7 +297,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         GenerateHandsRpc();
         ShowNamesRpc();
 
-        HandleTurn();
+        HandleTurnRpc(true);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -493,9 +505,53 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
             SceneLoadedRpc(clientIndex[NetworkManager.Singleton.LocalClientId]);
     }
 
-    private void HandleTurn()
+    private IEnumerator initCountdown(bool myTurn)
     {
-        if (currentIdTurn.Value == clientIndex[NetworkManager.Singleton.LocalClientId])
+        countdown.color = myTurn ? myCountdown : otherCountdown;
+        
+        float timer = moveTime;
+        while (timer > 0f)
+        {
+            timer = Mathf.Clamp(timer - Time.deltaTime, 0f, moveTime);
+            countdown.text = Mathf.Ceil(timer).ToString();
+            if (timer <= 10f)
+            {
+                countdown.color = myTurn ? myCountdownWarning : otherCountdownWarning;
+            }
+            yield return null;
+        }
+        if (myTurn)
+        {
+            VisualManager.Instance.MakeMove();
+            afkMoves++;
+            if (afkMoves >= afkLimit)
+            {
+                Exit();
+            }
+            else
+            {
+                ChangeTurnRpc();
+            }
+        }
+    }
+
+    private void HandleTurn(bool updateCountdown)
+    {
+        bool myTurn = currentIdTurn.Value == clientIndex[NetworkManager.Singleton.LocalClientId];
+        if (updateCountdown)
+        {
+            if (countdownCoroutine != null)
+            {
+                StopCoroutine(countdownCoroutine);
+                countdownCoroutine = null;
+                countdown.text = string.Empty;
+            }
+            if (NetworkManager.Singleton.ConnectedClientsIds.Count > 1)
+            {
+                countdownCoroutine = StartCoroutine(initCountdown(myTurn));
+            }
+        }
+        if (myTurn)
         {
             VisualManager.Instance.RefreshHand();
         }
@@ -575,11 +631,21 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         SkipMoveRpc();
     }
 
+    [Rpc(SendTo.ClientsAndHost)]
+    private void StopCountdownRpc()
+    {
+        StopCoroutine(countdownCoroutine);
+        countdownCoroutine = null;
+        countdown.text = string.Empty;
+    }
+
     private void FinishGame()
     {
         EndGameRpc();
         ShowWinnerRpc();
         GenerateGraphRpc();
+
+        StopCountdownRpc();
     }
 
     [Rpc(SendTo.Server)]
@@ -621,6 +687,8 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
 
     public void MakeMove(Vector2 position, bool state, int[] code)
     {
+        afkMoves = 0;
+
         ConstructTilesAround(position, state, code);
         GetDiceRpc(clientIndex[NetworkManager.Singleton.LocalClientId]);
         NullSkippedPlayersRpc();
@@ -691,5 +759,16 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
             stars[i] = CountStarsFor(i);
         }
         return stars;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SetCountdownRpc()
+    {
+        countdown = GameHandler.Instance.countdown;
+    }
+
+    public void SetCountdown()
+    {
+        SetCountdownRpc();
     }
 }

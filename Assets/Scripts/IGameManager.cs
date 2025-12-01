@@ -3,6 +3,7 @@ using UnityEngine;
 
 public interface IGameManager
 {
+    public void SetCountdown();
     public void MakeComputerMove();
     public void MakeMove(Vector2 position, bool state, int[] code);
     public void HandleButton(int index, int[] code);
