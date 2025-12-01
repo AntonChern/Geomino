@@ -28,7 +28,12 @@ public class RoomManager : MonoBehaviour
 
     public event EventHandler OnUpdateRoom;
 
-    private string playerName = "Name";
+    private string[] names = new string[]
+    {
+        "Èìÿ",
+        "Name"
+    };
+    private string playerName;
     public string PlayerName
     {
         get => playerName;
@@ -52,6 +57,8 @@ public class RoomManager : MonoBehaviour
         }
         Instance = this;
 
+        playerName = names[CorrectLang.langIndices[YG2.lang]];
+
         string existingPlayerName = PlayerPrefs.GetString(playerNamePropertyKey);
         //if (YG2.player.auth)
         //{
@@ -59,6 +66,8 @@ public class RoomManager : MonoBehaviour
         //}
         if (existingPlayerName != "")
             playerName = existingPlayerName;
+        PlayerPrefs.SetString(playerNamePropertyKey, playerName);
+        PlayerPrefs.Save();
     }
 
     async void Start()
@@ -84,9 +93,9 @@ public class RoomManager : MonoBehaviour
             case "MainMenu":
                 AuthenticationService.Instance.SignOut();
                 break;
-            //case "RoomSystem":
-
-            //    break;
+            case "RoomSystem":
+                YG2.InterstitialAdvShow();
+                break;
         }
     }
 
@@ -108,6 +117,7 @@ public class RoomManager : MonoBehaviour
 
     public void UpdateMap(string value)
     {
+        Debug.Log($"map updated {value}");
         SessionProperty sessionProperty = new SessionProperty(value, VisibilityPropertyOptions.Public);
         ActiveSession.AsHost().SetProperty(mapProperty, sessionProperty);
         ActiveSession.AsHost().SavePropertiesAsync();

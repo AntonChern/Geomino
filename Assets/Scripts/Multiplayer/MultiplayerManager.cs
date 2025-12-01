@@ -28,6 +28,11 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     private Dictionary<ulong, int> clientIndex = new Dictionary<ulong, int>();
 
     private List<List<int[]>> hands = new List<List<int[]>>();
+    private string[] returnText = new string[]
+    {
+        "Возвращение в комнату через ",
+        "Return to the room in "
+    };
 
     private void Awake()
     {
@@ -194,10 +199,9 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
             while (timer > 0f)
             {
                 timer = Mathf.Clamp(timer - Time.deltaTime, 0f, returningTime);
-                WinnerGraph.Instance.SetExitButtonText($"Возвращение в комнату через {Mathf.Ceil(timer)}");
+                WinnerGraph.Instance.SetExitButtonText(returnText[CorrectLang.langIndices[YG2.lang]] + $"{Mathf.Ceil(timer)}");
                 yield return null;
             }
-            YG2.InterstitialAdvShow();
             if (NetworkManager.Singleton.IsHost)
             {
                 QuitGame();

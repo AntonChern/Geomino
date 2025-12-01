@@ -1,6 +1,9 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using YG;
+using YG.LanguageLegacy;
 
 public class CreateRoom : MonoBehaviour
 {
@@ -13,6 +16,26 @@ public class CreateRoom : MonoBehaviour
     [SerializeField] private TMP_Dropdown players;
     [SerializeField] private Toggle isPrivate;
     [SerializeField] private TMP_Dropdown map;
+    private string[] roomNameWarning = new string[]
+    {
+        "Название комнаты не может быть пустым!",
+        "Room name cannot be empty!"
+    };
+    private string[] roomNameTemplate = new string[]
+    {
+        "Комната игрока ",
+        " player's room"
+    };
+    private string[] createText = new string[]
+    {
+        "Создать",
+        "Create"
+    };
+    private Func<string, string, string>[] constructRoomName = new Func<string, string, string>[]
+    {
+        (string template, string playerName) => { return template + playerName; },
+        (string template, string playerName) => { return playerName + template; }
+    };
 
     private void Awake()
     {
@@ -23,7 +46,8 @@ public class CreateRoom : MonoBehaviour
     {
         createRoomButton.onClick.AddListener(() =>
         {
-            RoomManager.Instance.CreateSessionAsHost(roomName.text, int.Parse(players.options[players.value].text), isPrivate.isOn, MapHandler.TranslateToEnglish(map.options[map.value].text));
+            //RoomManager.Instance.CreateSessionAsHost(roomName.text, int.Parse(players.options[players.value].text), isPrivate.isOn, MapHandler.TranslateToEnglish(map.options[map.value].text));
+            RoomManager.Instance.CreateSessionAsHost(roomName.text, int.Parse(players.options[players.value].text), isPrivate.isOn, map.value.ToString());
             Hide();
             RoomSpace.Instance.Show();
         });
@@ -40,7 +64,7 @@ public class CreateRoom : MonoBehaviour
                 foreach (Transform child in createRoomButton.transform)
                 {
                     if (child.GetComponent<TextMeshProUGUI>() == null) continue;
-                    child.GetComponent<TextMeshProUGUI>().text = "Название комнаты не может быть пустым!";
+                    child.GetComponent<TextMeshProUGUI>().text = roomNameWarning[CorrectLang.langIndices[YG2.lang]];
                     break;
                 }
             }
@@ -51,7 +75,7 @@ public class CreateRoom : MonoBehaviour
                 foreach (Transform child in createRoomButton.transform)
                 {
                     if (child.GetComponent<TextMeshProUGUI>() == null) continue;
-                    child.GetComponent<TextMeshProUGUI>().text = "Создать";
+                    child.GetComponent<TextMeshProUGUI>().text = createText[CorrectLang.langIndices[YG2.lang]];
                     break;
                 }
             }
@@ -72,7 +96,10 @@ public class CreateRoom : MonoBehaviour
     public void Show()
     {
         gameObject.SetActive(true);
-        roomName.text = "Комната игрока " + RoomManager.Instance.PlayerName;
+        roomName.text = constructRoomName[CorrectLang.langIndices[YG2.lang]](
+            roomNameTemplate[CorrectLang.langIndices[YG2.lang]],
+            RoomManager.Instance.PlayerName
+        );
     }
 
     public void Hide()

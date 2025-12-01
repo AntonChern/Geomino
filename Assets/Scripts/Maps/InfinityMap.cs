@@ -12,8 +12,8 @@ public class InfinityMap : MonoBehaviour, IMap
     private void Awake()
     {
 
-        if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "infinity" ||
-            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "infinity")
+        if (NetworkManager.Singleton == null && PlayerPrefs.GetInt("map") != 0 ||
+            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "0")
         {
             gameObject.SetActive(false);
             Destroy(gameObject);

@@ -5,6 +5,7 @@ using Unity.Services.Multiplayer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using YG;
 
 public class RoomSpace : MonoBehaviour
 {
@@ -27,6 +28,22 @@ public class RoomSpace : MonoBehaviour
 
     private int currentIndex = -1;
 
+    private string[] waitingClientText = new string[]
+    {
+        "Ожидание, пока хост начнёт игру...",
+        "Waiting for the host to start the game..."
+    };
+    private string[] waitingHostText = new string[]
+    {
+        "Ожидание игроков...",
+        "Waiting for the players..."
+    };
+    private string[] startText = new string[]
+    {
+        "Начать",
+        "Start"
+    };
+
     private void Start()
     {
         Instance = this;
@@ -47,7 +64,8 @@ public class RoomSpace : MonoBehaviour
 
         map.onValueChanged.AddListener((int value) =>
         {
-            RoomManager.Instance.UpdateMap(MapHandler.TranslateToEnglish(map.options[map.value].text));
+            //RoomManager.Instance.UpdateMap(MapHandler.TranslateToEnglish(map.options[map.value].text));
+            RoomManager.Instance.UpdateMap(map.value.ToString());
         });
 
         UpdatePlayerList();
@@ -144,7 +162,7 @@ public class RoomSpace : MonoBehaviour
             {
                 for (int i = 0; i < map.options.Count; i++)
                 {
-                    if (map.options[i].text == MapHandler.TranslateToRussian(session.Properties[RoomManager.mapProperty].Value))
+                    if (map.options[i].text == MapHandler.GetMapByIndex(session.Properties[RoomManager.mapProperty].Value))
                     {
                         map.value = i;
                         break;
@@ -156,7 +174,7 @@ public class RoomSpace : MonoBehaviour
         else
         {
             mapName.SetActive(true);
-            mapName.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = MapHandler.TranslateToRussian(session.Properties[RoomManager.mapProperty].Value);
+            mapName.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = MapHandler.GetMapByIndex(session.Properties[RoomManager.mapProperty].Value);
         }
 
         roomName.text = session.Name;
@@ -178,7 +196,7 @@ public class RoomSpace : MonoBehaviour
         foreach (Transform child in startGameButton.transform)
         {
             if (child.GetComponent<TextMeshProUGUI>() == null) continue;
-            child.GetComponent<TextMeshProUGUI>().text = "Ожидание игроков...";
+            child.GetComponent<TextMeshProUGUI>().text = waitingHostText[CorrectLang.langIndices[YG2.lang]];
             break;
         }
         ColorDisabled(startGameButton);
@@ -190,7 +208,7 @@ public class RoomSpace : MonoBehaviour
         foreach (Transform child in startGameButton.transform)
         {
             if (child.GetComponent<TextMeshProUGUI>() == null) continue;
-            child.GetComponent<TextMeshProUGUI>().text = "Ожидание, пока хост начнёт игру...";
+            child.GetComponent<TextMeshProUGUI>().text = waitingClientText[CorrectLang.langIndices[YG2.lang]];
             break;
         }
         ColorDisabled(startGameButton);
@@ -202,7 +220,7 @@ public class RoomSpace : MonoBehaviour
         foreach (Transform child in startGameButton.transform)
         {
             if (child.GetComponent<TextMeshProUGUI>() == null) continue;
-            child.GetComponent<TextMeshProUGUI>().text = "Начать";
+            child.GetComponent<TextMeshProUGUI>().text = startText[CorrectLang.langIndices[YG2.lang]];
             break;
         }
         ColorEnabled(startGameButton);

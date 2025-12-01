@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
+using YG;
 
 public class MapManager : MonoBehaviour
 {
@@ -8,7 +10,7 @@ public class MapManager : MonoBehaviour
 
     [SerializeField] private GameObject background;
     private MapScaler backgroundScaler;
-    private Vector2 backgroundOffset;
+    //private Vector2 backgroundOffset;
 
     private void Awake()
     {
@@ -18,7 +20,7 @@ public class MapManager : MonoBehaviour
     private void Start()
     {
         backgroundScaler = background.GetComponent<MapScaler>();
-        backgroundOffset = background.GetComponent<Renderer>().material.mainTextureOffset;
+        //backgroundOffset = background.GetComponent<Renderer>().material.mainTextureOffset;
 
         for (int i = 0; i < transform.childCount; i++)
         {
@@ -48,45 +50,54 @@ public class MapManager : MonoBehaviour
 
 public static class MapHandler
 {
-    public static string TranslateToEnglish(string map)
+    private static string[][] maps = new string[][]
     {
-        string result = string.Empty;
-        switch (map)
-        {
-            case "Бесконечная":
-                result = "infinity";
-                break;
-            case "Коридор":
-                result = "hallway";
-                break;
-            case "Гексагон":
-                result = "hexagon";
-                break;
-            case "Колонны":
-                result = "columns";
-                break;
-        }
-        return result;
-    }
+        new string[] { "Бесконечная", "Endless" },
+        new string[] { "Коридор", "Hallway" },
+        new string[] { "Гексагон", "Hexagon" },
+        new string[] { "Колонны", "Columns" }
+    };
 
-    public static string TranslateToRussian(string map)
+    //public static string TranslateToEnglish(string map)
+    //{
+    //    string result = string.Empty;
+    //    switch (map)
+    //    {
+    //        case "Бесконечная":
+    //            result = "infinity";
+    //            break;
+    //        case "Коридор":
+    //            result = "hallway";
+    //            break;
+    //        case "Гексагон":
+    //            result = "hexagon";
+    //            break;
+    //        case "Колонны":
+    //            result = "columns";
+    //            break;
+    //    }
+    //    return result;
+    //}
+
+    public static string GetMapByIndex(string mapIndex)
     {
-        string result = string.Empty;
-        switch (map)
-        {
-            case "infinity":
-                result = "Бесконечная";
-                break;
-            case "hallway":
-                result = "Коридор";
-                break;
-            case "hexagon":
-                result = "Гексагон";
-                break;
-            case "columns":
-                result = "Колонны";
-                break;
-        }
-        return result;
+        return maps[int.Parse(mapIndex)][CorrectLang.langIndices[YG2.lang]];
+        //string result = string.Empty;
+        //switch (mapIndex)
+        //{
+        //    case "0":
+        //        result = "Бесконечная";
+        //        break;
+        //    case "1":
+        //        result = "Коридор";
+        //        break;
+        //    case "2":
+        //        result = "Гексагон";
+        //        break;
+        //    case "3":
+        //        result = "Колонны";
+        //        break;
+        //}
+        //return result;
     }
 }

@@ -13,8 +13,8 @@ public class HexagonMap : MonoBehaviour, IMap
 
     private void Awake()
     {
-        if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "hexagon" ||
-            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "hexagon")
+        if (NetworkManager.Singleton == null && PlayerPrefs.GetInt("map") != 2 ||
+            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "2")
         {
             gameObject.SetActive(false);
             Destroy(gameObject);

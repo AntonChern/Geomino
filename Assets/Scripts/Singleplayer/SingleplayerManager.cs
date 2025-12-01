@@ -42,6 +42,11 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     [SerializeField] private Transform tilePrefab;
 
     private Difficulty[] difficulties;
+    private Dictionary<string, string> botText = new Dictionary<string, string>()
+    {
+        { "ru", "Бот" },
+        { "en", "Bot" }
+    };
 
     private void Awake()
     {
@@ -101,7 +106,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
     {
         for (int i = 0; i < players; i++)
         {
-            Scoreboard.Instance.SetPlayer(i, i == 0 ? PlayerPrefs.GetString("playerName") : $"Бот {DifficultyHandler.Translate(difficulties[i - 1])}");
+            Scoreboard.Instance.SetPlayer(i, i == 0 ? PlayerPrefs.GetString("playerName") : $"{DifficultyHandler.Translate(difficulties[i - 1])} {botText[YG2.lang]}");
         }
     }
 
@@ -618,7 +623,6 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
     public void EndGame()
     {
-        YG2.InterstitialAdvShow();
         SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
@@ -647,6 +651,7 @@ public class SingleplayerManager : MonoBehaviour, IGameManager
 
     private void ShowWinner()
     {
+        YG2.InterstitialAdvShow();
         WinnerGraph.Instance.ShowScoreboard();
         VisualManager.Instance.HideBackPanel();
     }

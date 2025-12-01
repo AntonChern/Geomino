@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using YG;
 using PlayerPrefs = RedefineYG.PlayerPrefs;
 
 public class SingleplayerMenu : MonoBehaviour
@@ -18,6 +19,11 @@ public class SingleplayerMenu : MonoBehaviour
     [SerializeField] private TextMeshProUGUI starsCounter;
 
     [SerializeField] private GameObject[] players;
+    private string[] names = new string[]
+    {
+        "Èìÿ",
+        "Name"
+    };
 
     private void Awake()
     {
@@ -58,11 +64,13 @@ public class SingleplayerMenu : MonoBehaviour
         });
         map.onValueChanged.AddListener((int value) =>
         {
-            PlayerPrefs.SetString("map", MapHandler.TranslateToEnglish(map.options[value].text));
+            //PlayerPrefs.SetString("map", MapHandler.TranslateToEnglish(map.options[value].text));
+            PlayerPrefs.SetInt("map", value);
             PlayerPrefs.Save();
         });
 
         starsCounter.text = PlayerPrefs.GetInt("stars").ToString();
+        map.value = PlayerPrefs.GetInt("map");
 
         PlayerPrefs.SetString("map", "infinity");
         PlayerPrefs.SetInt("players", 2);
@@ -77,6 +85,8 @@ public class SingleplayerMenu : MonoBehaviour
         table.SetActive(true);
         if (PlayerPrefs.GetString("playerName") != string.Empty) 
             playerName.text = PlayerPrefs.GetString("playerName");
+        else
+            playerName.text = names[CorrectLang.langIndices[YG2.lang]];
     }
 
     public void Hide()

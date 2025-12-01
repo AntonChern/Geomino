@@ -12,8 +12,8 @@ public class ColumnsMap : MonoBehaviour, IMap
 
     private void Awake()
     {
-        if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "columns" ||
-            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "columns")
+        if (NetworkManager.Singleton == null && PlayerPrefs.GetInt("map") != 3 ||
+            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "3")
         {
             gameObject.SetActive(false);
             Destroy(gameObject);

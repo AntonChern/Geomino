@@ -5,23 +5,29 @@
     ],
     "stringValues": [
         "infinity",
-        "Name"
+        "f"
     ],
-    "floatKeys": [],
-    "floatValues": [],
+    "floatKeys": [
+        "musicSilencer"
+    ],
+    "floatValues": [
+        0.8229636549949646
+    ],
     "intKeys": [
         "players",
         "difficulty0",
         "difficulty1",
         "difficulty2",
-        "stars"
+        "stars",
+        "map"
     ],
     "intValues": [
         2,
         1,
         1,
         1,
-        0
+        0,
+        2
     ],
     "intExample": 5,
     "strExample": "Hello!",
@@ -31,5 +37,5 @@
         false,
         false
     ],
-    "idSave": 156
+    "idSave": 761
 }

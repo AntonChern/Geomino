@@ -37,7 +37,7 @@ public class Room : MonoBehaviour
 
         sessionName.text = session.Name;
         Debug.Log(session.Properties[RoomManager.mapProperty].Value);
-        map.text = MapHandler.TranslateToRussian(session.Properties[RoomManager.mapProperty].Value);
+        map.text = MapHandler.GetMapByIndex(session.Properties[RoomManager.mapProperty].Value);
         players.text = $"{session.MaxPlayers - session.AvailableSlots}/{session.MaxPlayers}";
     }
 }

@@ -13,8 +13,8 @@ public class HallwayMap : MonoBehaviour, IMap
 
     private void Awake()
     {
-        if (NetworkManager.Singleton == null && PlayerPrefs.GetString("map") != "hallway" ||
-            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "hallway")
+        if (NetworkManager.Singleton == null && PlayerPrefs.GetInt("map") != 1 ||
+            NetworkManager.Singleton != null && RoomManager.Instance.ActiveSession.Properties[RoomManager.mapProperty].Value != "1")
         {
             gameObject.SetActive(false);
             Destroy(gameObject);
