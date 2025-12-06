@@ -4,6 +4,8 @@ using PlayerPrefs = RedefineYG.PlayerPrefs;
 
 public class GameExitMessage : MonoBehaviour
 {
+    [SerializeField] private Button showButton;
+
     [SerializeField] private Button exitButton;
     [SerializeField] private Button cancelButton;
 
@@ -14,6 +16,10 @@ public class GameExitMessage : MonoBehaviour
 
     private void Start()
     {
+        showButton.onClick.AddListener(() =>
+        {
+            Show();
+        });
         exitButton.onClick.AddListener(() =>
         {
             GameHandler.Instance.Exit();

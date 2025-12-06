@@ -92,6 +92,7 @@ public class RoomManager : MonoBehaviour
         switch (arg0.name)
         {
             case "MainMenu":
+                YG2.InterstitialAdvShow();
                 AuthenticationService.Instance.SignOut();
                 break;
             case "RoomSystem":

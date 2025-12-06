@@ -1,6 +1,7 @@
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using YG;
 
 public class GameHandler : MonoBehaviour
 {
@@ -66,6 +67,7 @@ public class GameHandler : MonoBehaviour
 
     public void Exit()
     {
+        YG2.InterstitialAdvShow();
         gameManager.Exit();
     }
 

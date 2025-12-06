@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YG;
@@ -19,8 +18,9 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     private Color otherCountdown = Color.gray;
     private Color otherCountdownWarning = new Color(0.390625f, 0f, 0f, 1f);
     private TextMeshProUGUI countdown;
+    private NetworkVariable<int> countdownNumber = new NetworkVariable<int>(-1);
     private Coroutine countdownCoroutine;
-    private int afkMoves = 0;
+    private List<int> afkPlayerMoves = new List<int>();
     private int afkLimit = 3;
 
     private int faces = 3;
@@ -83,6 +83,8 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
             {
                 sceneLoaded[clientIndex[index]] = false;
                 hands.Add(new List<int[]>());
+
+                afkPlayerMoves.Add(0);
             }
         }
         NetworkManager.Singleton.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
@@ -94,6 +96,18 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         {
             HandleTurn(true);
             Scoreboard.Instance.UpdateTurn(newValue);
+        };
+
+        countdownNumber.OnValueChanged += (int oldValue, int newValue) =>
+        {
+            countdown.text = newValue < 0 ? string.Empty : newValue.ToString();
+
+            bool myTurn = currentIdTurn.Value == clientIndex[NetworkManager.Singleton.LocalClientId];
+            countdown.color = myTurn ? myCountdown : otherCountdown;
+            if (countdownNumber.Value <= 10)
+            {
+                countdown.color = myTurn ? myCountdownWarning : otherCountdownWarning;
+            }
         };
 
         winners.OnListChanged += Winners_OnListChanged;
@@ -143,6 +157,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         }
         scores.RemoveAt(index);
         hands.RemoveAt(index);
+        afkPlayerMoves.RemoveAt(index);
         UpdateInterfaceRpc(bag.Count, index);
     }
 
@@ -327,6 +342,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     [Rpc(SendTo.Server)]
     public void GetDiceRpc(int clientId)
     {
+        afkPlayerMoves[clientId] = 0;
         GetDiceRpc(clientId, Random.Range(0, bag.Count - 1));
     }
 
@@ -505,51 +521,68 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
             SceneLoadedRpc(clientIndex[NetworkManager.Singleton.LocalClientId]);
     }
 
-    private IEnumerator initCountdown(bool myTurn)
+    private IEnumerator initCountdown()
     {
-        countdown.color = myTurn ? myCountdown : otherCountdown;
+        //countdown.color = myTurn ? myCountdown : otherCountdown;
         
         float timer = moveTime;
         while (timer > 0f)
         {
             timer = Mathf.Clamp(timer - Time.deltaTime, 0f, moveTime);
-            countdown.text = Mathf.Ceil(timer).ToString();
-            if (timer <= 10f)
-            {
-                countdown.color = myTurn ? myCountdownWarning : otherCountdownWarning;
-            }
+            //countdown.text = Mathf.Ceil(timer).ToString();
+            countdownNumber.Value = (int)Mathf.Ceil(timer);
+            //if (timer <= 10f)
+            //{
+            //    countdown.color = myTurn ? myCountdownWarning : otherCountdownWarning;
+            //}
             yield return null;
         }
-        if (myTurn)
+        afkPlayerMoves[currentIdTurn.Value]++;
+        if (afkPlayerMoves[currentIdTurn.Value] >= afkLimit)
+        {
+            RoomManager.Instance.KickPlayer(RoomManager.Instance.ActiveSession.Players[currentIdTurn.Value].Id);
+        }
+        else
+        {
+            DisableMoveRpc(currentIdTurn.Value);
+            ChangeTurnRpc();
+        }
+        //if (myTurn)
+        //{
+        
+        //}
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void DisableMoveRpc(int currentClientIndex)
+    {
+        if (currentClientIndex == clientIndex[NetworkManager.Singleton.LocalClientId])
         {
             VisualManager.Instance.MakeMove();
-            afkMoves++;
-            if (afkMoves >= afkLimit)
-            {
-                Exit();
-            }
-            else
-            {
-                ChangeTurnRpc();
-            }
+        }
+    }
+
+    private void UpdateCountdown()
+    {
+        if (countdownCoroutine != null)
+        {
+            StopCoroutine(countdownCoroutine);
+            countdownCoroutine = null;
+            countdownNumber.Value = -1;
+            //countdown.text = string.Empty;
+        }
+        if (NetworkManager.Singleton.ConnectedClientsIds.Count > 1)
+        {
+            countdownCoroutine = StartCoroutine(initCountdown());
         }
     }
 
     private void HandleTurn(bool updateCountdown)
     {
         bool myTurn = currentIdTurn.Value == clientIndex[NetworkManager.Singleton.LocalClientId];
-        if (updateCountdown)
+        if (updateCountdown && RoomManager.Instance.IsHost())
         {
-            if (countdownCoroutine != null)
-            {
-                StopCoroutine(countdownCoroutine);
-                countdownCoroutine = null;
-                countdown.text = string.Empty;
-            }
-            if (NetworkManager.Singleton.ConnectedClientsIds.Count > 1)
-            {
-                countdownCoroutine = StartCoroutine(initCountdown(myTurn));
-            }
+            UpdateCountdown();
         }
         if (myTurn)
         {
@@ -687,8 +720,6 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
 
     public void MakeMove(Vector2 position, bool state, int[] code)
     {
-        afkMoves = 0;
-
         ConstructTilesAround(position, state, code);
         GetDiceRpc(clientIndex[NetworkManager.Singleton.LocalClientId]);
         NullSkippedPlayersRpc();
