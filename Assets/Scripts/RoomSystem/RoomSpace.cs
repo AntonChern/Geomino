@@ -12,6 +12,7 @@ public class RoomSpace : MonoBehaviour
     public static RoomSpace Instance;
 
     [SerializeField] private Button startGameButton;
+    [SerializeField] private TextMeshProUGUI hintText;
     [SerializeField] private Button leaveGameButton;
     [SerializeField] private GameObject[] tiles;
     [SerializeField] private TMP_InputField[] nameFields;
@@ -25,6 +26,8 @@ public class RoomSpace : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI roomName;
     private bool mapShowed = false;
+
+    private bool readiness = false;
 
     private int currentIndex = -1;
 
@@ -43,6 +46,16 @@ public class RoomSpace : MonoBehaviour
         "Начать",
         "Start"
     };
+    private string[] readyText = new string[]
+    {
+        "Готов",
+        "Ready"
+    };
+    private string[] notReadyText = new string[]
+    {
+        "Не готов",
+        "Not ready"
+    };
 
     private void Start()
     {
@@ -53,8 +66,16 @@ public class RoomSpace : MonoBehaviour
 
         startGameButton.onClick.AddListener(() =>
         {
-            RoomManager.Instance.LockSession();
-            NetworkManager.Singleton.SceneManager.LoadScene(RoomManager.Instance.GameScene, LoadSceneMode.Single);
+            if (RoomManager.Instance.IsHost())
+            {
+                RoomManager.Instance.LockSession();
+                NetworkManager.Singleton.SceneManager.LoadScene(RoomManager.Instance.GameScene, LoadSceneMode.Single);
+            }
+            else
+            {
+                readiness = !readiness;
+                RoomManager.Instance.UpdateReadiness(readiness);
+            }
         });
 
         leaveGameButton.onClick.AddListener(() =>
@@ -141,18 +162,36 @@ public class RoomSpace : MonoBehaviour
 
         if (RoomManager.Instance.IsHost())
         {
-            if (NetworkManager.Singleton.ConnectedClientsIds.Count > 1)
+            if (NetworkManager.Singleton.ConnectedClientsIds.Count > 1 && AllReady())
             {
-                EnableStartButton();
+                EnableStartButton(startText[CorrectLang.langIndices[YG2.lang]]);
+                hintText.text = string.Empty;
             }
             else
             {
-                DisableStartButtonHost();
+                DisableStartButton();
+                hintText.text = waitingHostText[CorrectLang.langIndices[YG2.lang]];
             }
         }
         else
         {
-            DisableStartButtonClient();
+            if (readiness)
+            {
+                EnableStartButton(notReadyText[CorrectLang.langIndices[YG2.lang]]);
+                if (AllReady())
+                {
+                    hintText.text = waitingClientText[CorrectLang.langIndices[YG2.lang]];
+                }
+                else
+                {
+                    hintText.text = waitingHostText[CorrectLang.langIndices[YG2.lang]];
+                }
+            }
+            else
+            {
+                EnableStartButton(readyText[CorrectLang.langIndices[YG2.lang]]);
+                hintText.text = string.Empty;
+            }
         }
 
         if (RoomManager.Instance.IsHost())
@@ -178,6 +217,18 @@ public class RoomSpace : MonoBehaviour
         }
 
         roomName.text = session.Name;
+    }
+
+    private bool AllReady()
+    {
+        var session = RoomManager.Instance.ActiveSession;
+        if (session == null) return false;
+        bool result = true;
+        foreach (IReadOnlyPlayer player in session.Players)
+        {
+            result = result && bool.Parse(player.Properties[RoomManager.readinessPropertyKey].Value);
+        }
+        return result;
     }
 
     private void ColorDisabled(Button button)
@@ -214,13 +265,19 @@ public class RoomSpace : MonoBehaviour
         ColorDisabled(startGameButton);
     }
 
-    private void EnableStartButton()
+    private void DisableStartButton()
+    {
+        startGameButton.enabled = false;
+        ColorDisabled(startGameButton);
+    }
+
+    private void EnableStartButton(string text)
     {
         startGameButton.enabled = true;
         foreach (Transform child in startGameButton.transform)
         {
             if (child.GetComponent<TextMeshProUGUI>() == null) continue;
-            child.GetComponent<TextMeshProUGUI>().text = startText[CorrectLang.langIndices[YG2.lang]];
+            child.GetComponent<TextMeshProUGUI>().text = text;
             break;
         }
         ColorEnabled(startGameButton);

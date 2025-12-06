@@ -46,6 +46,7 @@ public class RoomManager : MonoBehaviour
 
     public const string playerNamePropertyKey = "playerName";
     public const string starCounterPropertyKey = "starCounter";
+    public const string readinessPropertyKey = "readiness";
     public const string mapProperty = "map";
 
     private void Awake()
@@ -123,6 +124,14 @@ public class RoomManager : MonoBehaviour
         ActiveSession.AsHost().SavePropertiesAsync();
     }
 
+    public void UpdateReadiness(bool readiness)
+    {
+        if (ActiveSession == null) return;
+        var readinessProperty = new PlayerProperty(readiness.ToString(), VisibilityPropertyOptions.Member);
+        ActiveSession.CurrentPlayer.SetProperty(readinessPropertyKey, readinessProperty);
+        ActiveSession.SaveCurrentPlayerDataAsync();
+    }
+
     public void UpdatePlayerName(string newName)
     {
         playerName = newName;
@@ -163,12 +172,19 @@ public class RoomManager : MonoBehaviour
 
     Dictionary<string, PlayerProperty> GetPlayerProperties()
     {
+        return GetPlayerProperties(false);
+    }
+
+    Dictionary<string, PlayerProperty> GetPlayerProperties(bool readiness)
+    {
         var playerNameProperty = new PlayerProperty(playerName, VisibilityPropertyOptions.Member);
         var starCounterProperty = new PlayerProperty(PlayerPrefs.GetInt("stars").ToString(), VisibilityPropertyOptions.Member);
+        var readinessProperty = new PlayerProperty(readiness.ToString(), VisibilityPropertyOptions.Member);
         return new Dictionary<string, PlayerProperty>
         {
             { playerNamePropertyKey, playerNameProperty },
             { starCounterPropertyKey, starCounterProperty },
+            { readinessPropertyKey, readinessProperty },
         };
     }
 
@@ -186,7 +202,7 @@ public class RoomManager : MonoBehaviour
 
     public async void CreateSessionAsHost(string name, int maxPlayers, bool isPrivate, string map)
     {
-        var playerProperties = GetPlayerProperties();
+        var playerProperties = GetPlayerProperties(true);
         var sessionMapProperty = new SessionProperty(map, VisibilityPropertyOptions.Public);
 
         var options = new SessionOptions

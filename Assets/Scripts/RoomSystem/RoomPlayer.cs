@@ -8,6 +8,7 @@ public class RoomPlayer : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerName;
     [SerializeField] private TextMeshProUGUI starCounter;
     [SerializeField] private Button kickButton;
+    [SerializeField] private GameObject readyAura;
 
     private IReadOnlyPlayer player;
 
@@ -32,5 +33,9 @@ public class RoomPlayer : MonoBehaviour
 
         playerName.text = $"{player.Properties[RoomManager.playerNamePropertyKey].Value}";
         starCounter.text = $"{player.Properties[RoomManager.starCounterPropertyKey].Value}";
+        if (readyAura != null)
+        {
+            readyAura.SetActive(bool.Parse(player.Properties[RoomManager.readinessPropertyKey].Value));
+        }
     }
 }

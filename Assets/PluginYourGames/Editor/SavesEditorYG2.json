@@ -5,7 +5,7 @@
     ],
     "stringValues": [
         "infinity",
-        "3"
+        "goofy"
     ],
     "floatKeys": [
         "musicSilencer"
@@ -24,7 +24,7 @@
     "intValues": [
         2,
         1,
-        1,
+        2,
         1,
         6,
         2
@@ -37,5 +37,5 @@
         false,
         false
     ],
-    "idSave": 1256
+    "idSave": 1421
 }
