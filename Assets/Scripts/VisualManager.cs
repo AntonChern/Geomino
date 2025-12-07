@@ -292,6 +292,7 @@ public class VisualManager : MonoBehaviour
     {
         HidePlaces();
         DisableDicesUI();
+        Unchoose();
     }
 
     public void HideBackPanel()

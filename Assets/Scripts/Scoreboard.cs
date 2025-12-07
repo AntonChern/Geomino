@@ -73,7 +73,8 @@ public class Scoreboard : MonoBehaviour
 
     public void UpdateTurn(int index)
     {
-        frame.transform.DOMove(new Vector3(frame.transform.position.x, names[index].transform.position.y, frame.transform.position.z), 0.25f);
+        frame.transform.DOLocalMoveY(names[index].transform.localPosition.y, 0.25f);
+        //frame.transform.DOMove(new Vector3(frame.transform.position.x, names[index].transform.position.y, frame.transform.position.z), 0.25f);
         //frame.transform.position = new Vector3(frame.transform.position.x, names[index].transform.position.y, frame.transform.position.z);
     }
 

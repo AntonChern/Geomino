@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -343,7 +342,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     [Rpc(SendTo.Server)]
     public void GetDiceRpc(int clientId)
     {
-        afkPlayerMoves[clientId] = 0;
+        //afkPlayerMoves[clientId] = 0;
         GetDiceRpc(clientId, Random.Range(0, bag.Count - 1));
     }
 
@@ -403,6 +402,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
         };
 
         hands[clientId].RemoveAll(x => equals(x, code));
+        afkPlayerMoves[clientId] = 0;
     }
 
     private void ConstructTilesAround(Vector2 position, bool state, int[] code)
@@ -685,6 +685,8 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     [Rpc(SendTo.Server)]
     public void SkipMoveRpc()
     {
+        afkPlayerMoves[currentIdTurn.Value] = 0;
+
         skippedPlayers++;
         if (NetworkManager.Singleton.ConnectedClientsList.Count == skippedPlayers)
         {
