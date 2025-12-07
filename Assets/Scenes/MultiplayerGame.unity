@@ -3135,11 +3135,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 325459404}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -40, y: -315}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 180, y: -40}
   m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 1, y: 1}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &667180864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3197,7 +3197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4810,7 +4810,7 @@ GameObject:
   - component: {fileID: 1062762429}
   - component: {fileID: 1062762428}
   m_Layer: 5
-  m_Name: MouseRight
+  m_Name: Drag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4848,14 +4848,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 2830839015498766839, guid: 6d74caaaf1af83d48ae8fd42ad756c61, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5126,7 +5126,7 @@ GameObject:
   - component: {fileID: 1091297678}
   - component: {fileID: 1091297680}
   m_Layer: 5
-  m_Name: RightText
+  m_Name: DragText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5180,8 +5180,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 2164260863
-  m_fontColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -5736,7 +5736,7 @@ GameObject:
   - component: {fileID: 1129999146}
   - component: {fileID: 1129999148}
   m_Layer: 5
-  m_Name: MiddleText
+  m_Name: ZoomText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5790,8 +5790,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 2164260863
-  m_fontColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -6774,7 +6774,7 @@ GameObject:
   - component: {fileID: 1285293536}
   - component: {fileID: 1285293538}
   m_Layer: 5
-  m_Name: LeftText
+  m_Name: PlaceText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6828,8 +6828,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 2164260863
-  m_fontColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -7761,7 +7761,7 @@ GameObject:
   - component: {fileID: 1389318505}
   - component: {fileID: 1389318504}
   m_Layer: 5
-  m_Name: MouseLeft
+  m_Name: Place
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7799,14 +7799,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -7034277061224943814, guid: e9783d48177029144a94e3550d2fd448, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8938,6 +8938,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1573050030}
+  - component: {fileID: 1573050031}
   m_Layer: 5
   m_Name: Help
   m_TagString: Untagged
@@ -8957,12 +8958,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2011651929}
-  - {fileID: 1062762427}
   - {fileID: 1389318503}
-  - {fileID: 1129999145}
-  - {fileID: 1091297677}
+  - {fileID: 1062762427}
+  - {fileID: 2011651929}
   - {fileID: 1285293535}
+  - {fileID: 1091297677}
+  - {fileID: 1129999145}
   m_Father: {fileID: 325459404}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
@@ -8970,6 +8971,30 @@ RectTransform:
   m_AnchoredPosition: {x: 49.999023, y: -100}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 1, y: 1}
+--- !u!114 &1573050031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1573050029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2996dd65ac9cbd438d536c987718c52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HelpViewHandler
+  helpIcons:
+  - {fileID: 1389318504}
+  - {fileID: 1062762428}
+  - {fileID: 2011651930}
+  desktopSprites:
+  - {fileID: -7034277061224943814, guid: e9783d48177029144a94e3550d2fd448, type: 3}
+  - {fileID: 2830839015498766839, guid: 6d74caaaf1af83d48ae8fd42ad756c61, type: 3}
+  - {fileID: 6374460414275088684, guid: 8f641f4d97b13ee48a59486720ad53da, type: 3}
+  mobileSprites:
+  - {fileID: -2070877840962490725, guid: 7cb541fab7ffb5945acb69f2bdb03310, type: 3}
+  - {fileID: 7870231862400207233, guid: 4b39ee6041d9b4f4b9c93409afe1acc7, type: 3}
+  - {fileID: 451278539654886796, guid: f3d03efeadda7dd4fad193e526399bfa, type: 3}
 --- !u!1 &1575319759
 GameObject:
   m_ObjectHideFlags: 0
@@ -11416,7 +11441,7 @@ GameObject:
   - component: {fileID: 2011651931}
   - component: {fileID: 2011651930}
   m_Layer: 5
-  m_Name: MouseMiddle
+  m_Name: Zoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11454,14 +11479,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 6374460414275088684, guid: 8f641f4d97b13ee48a59486720ad53da, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

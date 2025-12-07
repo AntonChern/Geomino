@@ -96,6 +96,10 @@ public class RoomManager : MonoBehaviour
                 AuthenticationService.Instance.SignOut();
                 break;
             case "RoomSystem":
+                if (!IsHost())
+                {
+                    UpdateReadiness(false);
+                }
                 YG2.InterstitialAdvShow();
                 break;
         }

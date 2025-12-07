@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -697,6 +698,7 @@ public class MultiplayerManager : NetworkBehaviour, IGameManager
     void GenerateGraphRpc()
     {
         WinnerGraph.Instance.Draw();
+        countdown.text = string.Empty;
     }
 
     [Rpc(SendTo.ClientsAndHost)]

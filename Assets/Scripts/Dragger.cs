@@ -11,6 +11,8 @@ public class Dragger : MonoBehaviour
     private Vector3 initialPosition;
     private bool dragStarted;
 
+    private bool isMobile;
+
     private void Start()
     {
         initialPosition = transform.position;
@@ -19,6 +21,8 @@ public class Dragger : MonoBehaviour
         {
             ResetPosition();
         });
+
+        isMobile = Application.isMobilePlatform;
     }
 
     private void ResetPosition()
@@ -32,7 +36,7 @@ public class Dragger : MonoBehaviour
     {
         PointerEventData eventData = new(EventSystem.current)
         {
-            position = Input.mousePosition
+            position = isMobile ? Input.GetTouch(0).position : Input.mousePosition
         };
 
         List<RaycastResult> results = new();
@@ -49,28 +53,65 @@ public class Dragger : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (!isMobile)
         {
-            if (!Pointable()) return;
-            dragOrigin = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            dragStarted = true;
+            if (Input.GetMouseButtonDown(1))
+            {
+                if (!Pointable()) return;
+                dragOrigin = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                dragStarted = true;
+            }
+
+            if (Input.GetMouseButton(1))
+            {
+                if (!dragStarted) return;
+
+                Vector3 currentMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Vector3 offset = currentMousePos - dragOrigin;
+
+                transform.position -= offset;
+
+                MapManager.Instance.DragBackground(offset);
+            }
+
+            if (Input.GetMouseButtonUp(1))
+            {
+                dragStarted = false;
+            }
         }
-
-        if (Input.GetMouseButton(1))
+        else
         {
-            if (!dragStarted) return;
+            if (Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0);
+                Debug.Log($"touched {touch.position}");
+                if (touch.phase == TouchPhase.Began)
+                {
+                    if (!Pointable()) return;
+                    dragOrigin = Camera.main.ScreenToWorldPoint(touch.position);
+                    dragStarted = true;
+                }
+                if (touch.phase == TouchPhase.Moved)
+                {
+                    if (!dragStarted) return;
 
-            Vector3 currentMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 offset = currentMousePos - dragOrigin;
+                    Vector3 currentMousePos = Camera.main.ScreenToWorldPoint(touch.position);
+                    Vector3 offset = currentMousePos - dragOrigin;
 
-            transform.position -= offset;
+                    transform.position -= offset;
 
-            MapManager.Instance.DragBackground(offset);
-        }
+                    MapManager.Instance.DragBackground(offset);
+                }
+                if (touch.phase == TouchPhase.Ended)
+                {
+                    dragStarted = false;
+                }
+            }
 
-        if (Input.GetMouseButtonUp(1))
-        {
-            dragStarted = false;
+            if (Input.touchCount == 0)
+            {
+                dragStarted = false;
+            }
         }
     }
 }
